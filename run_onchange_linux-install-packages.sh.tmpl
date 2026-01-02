@@ -1,0 +1,23 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+set -e
+
+# Update package list
+sudo apt-get update
+
+# Install packages from packages.yaml
+{{ range .packages.linux.packages -}}
+echo "Installing {{ . }}..."
+sudo apt-get install -y {{ . }} || echo "Failed to install {{ . }}, skipping..."
+{{ end }}
+
+# Install mise
+if ! command -v mise &> /dev/null; then
+    curl https://mise.run | sh
+fi
+
+# Install uv
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+{{ end -}}

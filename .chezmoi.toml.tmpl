@@ -1,0 +1,9 @@
+[onepassword]
+    mode = "service"
+[hooks.read-source-state.pre]
+    command = ".local/share/chezmoi/.install-password-manager.sh"
+[git]
+    autoAdd = false
+    autoCommit = false
+    autoPush = false
+

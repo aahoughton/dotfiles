@@ -1,0 +1,75 @@
+packages:
+  darwin:
+    brews:
+      # QUALITY OF LIFE
+      - 'bash'
+      - 'fish'
+      - 'htop'
+      - 'jump'
+      - 'neovim'
+      - 'ripgrep'
+      - 'tmux'
+      # DEV TOOLING
+      - 'awscli'
+      - 'curl'
+      - 'direnv'
+      - 'git'
+      - 'jq'
+      - 'mise'
+      - 'libpq'
+      - 'nmap'
+      - 'proctools'
+      - 'tcpflow'
+      - 'uv'
+      - 'xan'
+      - 'yq'
+      # LANGUAGES (use mise for most)
+      - 'ghc'
+    casks:
+      - '1password'
+      - '1password-cli'
+      - 'backblaze'
+      - 'cardhop'
+      - 'coteditor'
+      - 'daisydisk'
+      - 'discord'
+      - 'dropbox'
+      - 'fantastical'
+      - 'fastmail'
+      - 'firefox'
+      - 'ghostty'
+      - 'kaleidoscope'
+      - 'keka'
+      - 'intellij-idea'
+      - 'launchbar'
+      - 'little-snitch'
+      - 'modern-csv'
+      - 'orbstack'
+      - 'pdf-expert'
+      - 'popclip'
+      - 'rectangle-pro'
+      - 'slack'
+      - 'tailscale-app'
+      - 'visual-studio-code'
+      - 'zoom'
+
+  linux:
+    # Core CLI tools (available on most distros)
+    packages:
+      # QUALITY OF LIFE
+      - 'bash'
+      - 'fish'
+      - 'htop'
+      - 'neovim'
+      - 'ripgrep'
+      - 'tmux'
+      # DEV TOOLING
+      - 'awscli'
+      - 'curl'
+      - 'direnv'
+      - 'git'
+      - 'jq'
+      - 'nmap'
+      # Note: mise, uv, xan, yq, jump may need separate installation
+      # See run_onchange_linux-install-packages.sh.tmpl
+

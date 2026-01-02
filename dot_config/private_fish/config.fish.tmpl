@@ -1,0 +1,24 @@
+if status is-interactive
+{{ if eq .chezmoi.os "darwin" -}}
+    type -q brew && eval "$(brew shellenv)"
+
+{{ end -}}
+    type -q mise && mise activate fish | source
+
+    type -q direnv && direnv hook fish | source
+
+    type -q jump && jump shell fish | source
+
+    # Editor aliases
+    if type -q nvim
+        alias vi nvim
+        alias vim nvim
+        set -gx EDITOR nvim
+    end
+end
+
+fish_add_path $HOME/go/bin
+fish_add_path $HOME/.local/bin
+{{ if eq .chezmoi.os "darwin" }}
+source ~/.orbstack/shell/init2.fish 2>/dev/null || :
+{{ end -}}

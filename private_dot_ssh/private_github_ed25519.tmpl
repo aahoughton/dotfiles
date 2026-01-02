@@ -1,0 +1,5 @@
+{{- range (onepassword "github_ed25519" "Service Credentials").fields -}}
+{{-   if and (eq .label "private key") -}}
+{{ .value }}
+{{ end -}}
+{{- end -}}
