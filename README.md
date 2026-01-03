@@ -8,7 +8,7 @@ Machine setup using [chezmoi](https://www.chezmoi.io/).
 Install [Homebrew](https://brew.sh/) first, then:
 ```bash
 brew install chezmoi
-chezmoi init https://github.com/aahoughton/dotfiles.git
+chezmoi init git@github.com:aahoughton/dotfiles.git
 chezmoi apply
 ```
 
@@ -24,7 +24,7 @@ Install and apply:
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 export PATH="$HOME/.local/bin:$PATH"
-chezmoi init https://github.com/aahoughton/dotfiles.git
+chezmoi init git@github.com:aahoughton/dotfiles.git
 chezmoi apply
 ```
 
