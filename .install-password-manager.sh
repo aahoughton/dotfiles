@@ -8,7 +8,7 @@ Darwin)
     brew install 1password 1password-cli
     ;;
 Linux)
-    # Install 1Password CLI
+    # Install 1Password CLI -- https://developer.1password.com/docs/cli/install-server/
     case "$(uname -m)" in
         x86_64)
             ARCH="amd64"
