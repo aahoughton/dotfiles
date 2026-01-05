@@ -28,7 +28,7 @@ packages:
       - 'ghc'
     casks:
       - '1password'
-      - '1password-cli'
+      - '1password-cli' #should be covered by the pre-install script, but shrug
       - 'backblaze'
       - 'cardhop'
       - 'coteditor'

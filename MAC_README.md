@@ -2,12 +2,19 @@
 
 Configure macOS system settings:
 
-1. Change machine name (System Settings > General > About)
-2. Turn on SSH (Remote Login, System Settings > General > Sharing)
+1. Change machine name (System Settings > General > About > Name)
+2. Turn on SSH (System Settings > General > Sharing > Remote Login)
 3. Use Quad9 DNS (9.9.9.9, System Settings > Network > Wi-Fi > <SSID> > Details)
 4. Remove spotlight keyboard shortcuts (System Settings > Keyboard > Keyboard Shortcuts... > Spotlight)
-5. Use Function Keys (System Settings > Keyboard Shortcuts... > Function Keys)
+5. Use Function Keys (System Settings > Keyboard > Keyboard Shortcuts... > Function Keys)
 6. Turn on Tap-to-Click (System Settings > Trackpad > Tap to Click)
-7. Show Battery Percentage (System Settings > Control Center > Battery)
-8. Show Sound Settings (System Settings > Control Center > Sound)
+7. Show Battery Percentage (System Settings > Menu Bar > Battery > Battery Options...)
+8. Show Sound Settings (System Settings > Menu Bar > Sound)
+
+.. go through each installed cask and finalize setup
+.. for coteditor, set it as handler for txt and md files
+.. give 1password accessibility access
+.. dock: automatically show / hide
+.. dock: do not show recent / suggested
+.. launchbar: hide dock icon
 

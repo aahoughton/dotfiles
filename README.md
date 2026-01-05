@@ -1,14 +1,21 @@
 # Dotfiles
 
-Machine setup using [chezmoi](https://www.chezmoi.io/).
+Machine setup using [chezmoi](https://www.chezmoi.io/). These are personal notes 'cause I forget things.
 
 ## Fresh machine setup
 
 **macOS:**
-Install [Homebrew](https://brew.sh/) first, then:
+
+Prerequisites:
+
+1. Install [Homebrew](https://brew.sh/), get it setup for ZSH just long enough
+   to install chezmoi.
+2. `export OP_SERVICE_ACCOUNT_TOKEN="<TOKEN>"`
+
+Install and apply:
 ```bash
 brew install chezmoi
-chezmoi init git@github.com:aahoughton/dotfiles.git
+chezmoi init https://github.com/aahoughton/dotfiles.git
 chezmoi apply
 ```
 
@@ -24,41 +31,35 @@ Install and apply:
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 export PATH="$HOME/.local/bin:$PATH"
-chezmoi init git@github.com:aahoughton/dotfiles.git
+chezmoi init https://github.com/aahoughton/dotfiles.git
 chezmoi apply
 ```
 
-This installs packages and deploys configs. SSH keys and AWS credentials get templated from 1Password.
-
-### 1Password setup
-
-We use 1Password service accounts to template secrets. Set this before running `chezmoi apply`:
-
-```bash
-export OP_SERVICE_ACCOUNT_TOKEN="<TOKEN>"
-```
-
-The hook script will install the `op` CLI if it's missing.
+This installs packages and deploys configs; SSH keys and AWS credentials get templated from 1Password.
 
 ### Post-install
 
-Set Fish as the default shell:
+**General**
+
+Update the chezmoi git origin to use `ssh` instead of `https`:
+```bash
+chezmoi git config remote.origin.url "git@github.com:aahoughton/dotfiles.git"
+```
 
 **macOS:**
+
+Set Fish as the default shell:
+
 ```bash
 echo "$(brew --prefix)/bin/fish" | sudo tee -a /etc/shells
 chsh -s "$(brew --prefix)/bin/fish"
 ```
-
-Some apps need manual login (1Password, Backblaze, Tailscale, etc.). App Store apps like UpNote and Barbee need manual install.
 
 **Linux:**
 ```bash
 echo /usr/bin/fish | sudo tee -a /etc/shells
 chsh -s /usr/bin/fish
 ```
-
-Firefox extensions I use: 1Password, Facebook Container, Privacy Badger, Pinboard.
 
 IntelliJ note: turn off shell integration in terminal settings.
 
@@ -74,6 +75,6 @@ git add -A && git commit && git push
 
 ## Tools and language management
 
-mise handles language versions and automatically.
-uv for python venvs (`uv venv`)
+1. mise handles language versions and automatically.
+2. uv for python venvs (`uv venv`)
 
