@@ -1,6 +1,6 @@
 # Initial Mac Setup
 
-Configure macOS system settings:
+## System Settings
 
 1. Change machine name (System Settings > General > About > Name)
 2. Turn on SSH (System Settings > General > Sharing > Remote Login)
@@ -11,10 +11,11 @@ Configure macOS system settings:
 7. Show Battery Percentage (System Settings > Menu Bar > Battery > Battery Options...)
 8. Show Sound Settings (System Settings > Menu Bar > Sound)
 
-.. go through each installed cask and finalize setup
-.. for coteditor, set it as handler for txt and md files
-.. give 1password accessibility access
-.. dock: automatically show / hide
-.. dock: do not show recent / suggested
-.. launchbar: hide dock icon
+## Additional
 
+- go through each installed cask and finalize setup
+- coteditor: set it as handler for txt and md files
+- dock: automatically show / hide
+- dock: do not show recent / suggested
+- launcher: hide dock icon
+- backblaze: add orbstack data directory to excluded
