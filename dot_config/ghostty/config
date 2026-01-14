@@ -5,6 +5,7 @@ scrollback-limit = 1200000
 shell-integration-features = ssh-terminfo,ssh-env
 theme = Monokai Pro Octagon
 window-inherit-working-directory = false
+bell-features = border
 
 keybind = super+arrow_left=previous_tab
 keybind = super+arrow_right=next_tab
