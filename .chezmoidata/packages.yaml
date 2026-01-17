@@ -30,6 +30,7 @@ packages:
       - '1password'
       - '1password-cli' #should be covered by the pre-install script, but shrug
       - 'backblaze'
+      - 'bloom'
       - 'cardhop'
       - 'coteditor'
       - 'daisydisk'
