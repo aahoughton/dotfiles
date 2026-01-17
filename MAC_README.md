@@ -18,4 +18,4 @@
 - dock: automatically show / hide
 - dock: do not show recent / suggested
 - launcher: hide dock icon
-- backblaze: add orbstack data directory to excluded
+- backblaze: install manually (cask doesn't appear to work) and add orbstack data directory to excluded
