@@ -4,15 +4,16 @@ packages:
       # QUALITY OF LIFE
       - 'bash'
       - 'fish'
+      - 'helix'
       - 'htop'
       - 'jump'
-      - 'neovim'
       - 'ripgrep'
       - 'tmux'
       # DEV TOOLING
       - 'awscli'
       - 'curl'
       - 'direnv'
+      - 'fx'
       - 'gh'
       - 'git'
       - 'jq'
