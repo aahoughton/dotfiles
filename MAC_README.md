@@ -19,3 +19,9 @@
 - dock: do not show recent / suggested
 - launcher: hide dock icon
 - backblaze: install manually (cask doesn't appear to work) and add orbstack data directory to excluded
+- menubar spacing:
+  ```
+  defaults -currentHost write -globalDomain NSStatusItemSpacing -int 0
+  defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 0
+  killall ControlCenter
+  ```
