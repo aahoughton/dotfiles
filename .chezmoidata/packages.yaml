@@ -2,6 +2,7 @@ packages:
   darwin:
     brews:
       # QUALITY OF LIFE
+      - 'atuin'
       - 'bash'
       - 'fish'
       - 'helix'
@@ -30,7 +31,6 @@ packages:
     casks:
       - '1password'
       - '1password-cli' #should be covered by the pre-install script, but shrug
-      - 'atuin'
       - 'bloom'
       - 'cardhop'
       - 'coteditor'
@@ -47,7 +47,7 @@ packages:
       - 'keka'
       - 'intellij-idea'
       - 'itsycal'
-      - 'itsypad'
+      - 'nickustinov/tap/itsypad'
       - 'launchbar'
       - 'little-snitch'
       - 'modern-csv'
