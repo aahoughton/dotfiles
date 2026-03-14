@@ -23,6 +23,7 @@ packages:
       - 'nmap'
       - 'proctools'
       - 'tcpflow'
+      - 'watch'
       - 'uv'
       - 'xan'
       - 'yq'

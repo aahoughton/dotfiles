@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# gitsync — sync all git repos under a directory.
+#
+# For each repo: checks out default branch, pulls, prunes remote branches,
+# deletes local branches that are both merged and gone from remote, and warns
+# about case-insensitive branch name conflicts.
+#
+# Usage:
+#   gitsync [directory]    (defaults to current directory)
+
+# ANSI Color Codes
+RED='\033[0;31m'
+NC='\033[0m'
+
+TARGET_DIR="${1:-.}"
+
+if [ ! -d "$TARGET_DIR" ]; then
+    echo -e "${RED}Error: Directory $TARGET_DIR does not exist.${NC}"
+    exit 1
+fi
+
+# Move to the target directory and hide the stack output
+pushd "$TARGET_DIR" > /dev/null || exit
+
+REPO_COUNT=$(find . -maxdepth 2 -name ".git" | wc -l | xargs)
+echo "Processing $REPO_COUNT directories..."
+
+WARNINGS=()
+
+for repo_path in ./*/.git; do
+    repo=$(dirname "$repo_path")
+    repo_name=${repo#./}
+
+    # Enter the repo
+    if pushd "$repo" > /dev/null; then
+        echo "$repo_name"
+
+        # Determine default branch locally (fast)
+        DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^.*/@@')
+        : "${DEFAULT_BRANCH:=main}"
+
+        # 1. Checkout
+        if ! git checkout "$DEFAULT_BRANCH" &>/dev/null; then
+            WARNINGS+=("${RED}[!] $repo_name: Could not checkout $DEFAULT_BRANCH (dirty working tree?)${NC}")
+        else
+            # 2. Update
+            git pull --quiet &>/dev/null
+            git remote prune origin --quiet &>/dev/null
+
+            # 3. Safe Cleanup: Merged + Gone branches
+            # Finds branches that are gone on remote AND merged into current HEAD
+            MERGED_GONE=$(git branch -vv | grep ': gone]' | awk '{print $1}' | grep -v '*' | xargs -I {} git branch --merged | grep "^{}$")
+            if [ -n "$MERGED_GONE" ]; then
+                echo "$MERGED_GONE" | xargs git branch -d &>/dev/null
+            fi
+        fi
+
+        # 4. Case-insensitive check
+        DUPE_CHECK=$(git branch --format="%(refname:short)" | tr '[:upper:]' '[:lower:]' | sort | uniq -d)
+        if [ -n "$DUPE_CHECK" ]; then
+            for dupe in $DUPE_CHECK; do
+                ACTUALS=$(git branch --format="%(refname:short)" | grep -i "^$dupe$" | xargs)
+                WARNINGS+=("${RED}[!] $repo_name: Case-insensitive conflict: $ACTUALS${NC}")
+            done
+        fi
+
+        # Exit the repo back to TARGET_DIR
+        popd > /dev/null
+    fi
+done
+
+# Final summary
+if [ ${#WARNINGS[@]} -ne 0 ]; then
+    echo -e "\nWarnings:"
+    for warning in "${WARNINGS[@]}"; do
+        echo -e "$warning"
+    done
+fi
+
+# Return to where the user started
+popd > /dev/null

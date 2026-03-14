@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# psql2csv — run a query through psql and get clean CSV on stdout.
+#
+# Usage:
+#   psql2csv [psql-options...] QUERY
+#   psql2csv [psql-options...] < query.sql
+#
+# The query is the last positional argument, or stdin if piped.
+# All other arguments are forwarded to psql (e.g. -h, -p, -U, -d).
+#
+# Examples:
+#   psql2csv mydb "SELECT * FROM users"
+#   psql2csv -h localhost -U admin mydb "SELECT * FROM users WHERE active"
+#   psql2csv mydb < report.sql
+#   echo "SELECT 1 AS n" | psql2csv mydb
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  psql2csv [psql-options...] QUERY
+  psql2csv [psql-options...] < query.sql
+
+Wraps a query in COPY (...) TO STDOUT to produce RFC 4180 CSV with headers.
+All unrecognized options are forwarded directly to psql.
+
+Options:
+  -?, --help    Show this help
+  --no-header   Omit the CSV header row
+  --dry-run     Print the generated SQL instead of executing it
+EOF
+  exit 0
+}
+
+header=true
+dry_run=false
+psql_args=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --help|-\?) usage ;;
+    --no-header) header=false; shift ;;
+    --dry-run)   dry_run=true; shift ;;
+    *)           psql_args+=("$1"); shift ;;
+  esac
+done
+
+# Query: stdin if piped, otherwise last positional arg.
+query=""
+if [[ ! -t 0 ]]; then
+  query=$(cat)
+fi
+if [[ -z "$query" ]]; then
+  if [[ ${#psql_args[@]} -gt 0 ]]; then
+    query=${psql_args[${#psql_args[@]}-1]}
+    unset 'psql_args[${#psql_args[@]}-1]'
+  else
+    echo "psql2csv: missing query (pass as last argument or via stdin)" >&2
+    exit 1
+  fi
+fi
+
+# Strip trailing semicolons — COPY (...) chokes on them.
+query=$(printf '%s' "$query" | sed -E 's/[[:space:]]*;[[:space:]]*$//')
+
+copy_opts="FORMAT csv"
+[[ "$header" == true ]] && copy_opts="$copy_opts, HEADER"
+
+sql="COPY ($query) TO STDOUT WITH ($copy_opts)"
+
+if [[ "$dry_run" == true ]]; then
+  printf '%s\n' "$sql"
+else
+  psql --no-psqlrc --quiet "${psql_args[@]}" <<< "$sql"
+fi
