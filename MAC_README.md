@@ -1,6 +1,17 @@
 # Initial Mac Setup
 
-After `chezmoi init && chezmoi apply`, the following are handled automatically:
+## Bootstrap
+
+```bash
+ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aahoughton/dotfiles --ssh
+```
+
+Prerequisites: Homebrew installed, SSH key added (`ssh-add`).
+
+## Automated
+
+After the bootstrap above, the following are handled automatically:
 
 - Machine name (prompted during `chezmoi init`)
 - Homebrew packages and casks
