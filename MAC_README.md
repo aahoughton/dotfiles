@@ -32,3 +32,4 @@ After the bootstrap above, the following are handled automatically:
 3. CotEditor: set as handler for .txt and .md files
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
+6. **Behemoth only:** Start OrbStack, then run `setup-atuin-server` to start the atuin sync server. Then `atuin register` / `atuin login` on each machine.

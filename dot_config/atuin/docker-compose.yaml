@@ -1,0 +1,33 @@
+services:
+  atuin:
+    image: ghcr.io/atuinsh/atuin:latest
+    command: start
+    environment:
+      ATUIN_HOST: "0.0.0.0"
+      ATUIN_PORT: "8888"
+      ATUIN_OPEN_REGISTRATION: "true"
+      ATUIN_DB_URI: "postgresql://atuin:atuin@db/atuin"
+    ports:
+      - "8888:8888"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: atuin
+      POSTGRES_USER: atuin
+      POSTGRES_PASSWORD: atuin
+    volumes:
+      - atuin-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atuin"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  atuin-db:
