@@ -1,12 +1,10 @@
 #!/bin/bash
+# Set up self-hosted atuin sync server
+# Run manually on the machine that will host the server
+
 set -euo pipefail
 
 CONFIG_DIR="$HOME/.config/atuin"
-
-if [ "$(hostname)" != "behemoth" ]; then
-    echo "This script is intended to run on behemoth only."
-    exit 1
-fi
 
 if ! command -v docker &>/dev/null; then
     echo "Docker is not available. Install OrbStack or Docker Desktop first."

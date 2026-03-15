@@ -1,5 +1,6 @@
 README.md
 MAC_README.md
+scripts/
 
 {{ if ne .chezmoi.hostname "behemoth" }}
 .config/atuin/docker-compose.yaml

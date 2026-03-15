@@ -26,6 +26,16 @@ Update the chezmoi git origin to use `ssh` instead of `https`:
 chezmoi git config remote.origin.url "git@github.com:aahoughton/dotfiles.git"
 ```
 
+Install Claude Code plugins:
+```bash
+~/.local/share/chezmoi/scripts/install-claude-plugins.sh
+```
+
+Set up atuin sync server (if this machine will host it):
+```bash
+~/.local/share/chezmoi/scripts/setup-atuin-server.sh
+```
+
 IntelliJ note: turn off shell integration in terminal settings.
 
 ## Making changes

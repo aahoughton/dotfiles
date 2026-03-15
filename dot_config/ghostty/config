@@ -3,7 +3,7 @@ bell-features = border
 clipboard-paste-protection = true
 copy-on-select = clipboard
 scrollback-limit = 10_000_000
-shell-integration-features = ssh-terminfo,ssh-env
+shell-integration-features = cursor,sudo,title,ssh-terminfo,ssh-env
 theme = Monokai Pro Octagon
 window-inherit-working-directory = false
 
