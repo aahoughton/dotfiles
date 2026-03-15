@@ -1,17 +1,6 @@
-# Initial Mac Setup
+# macOS Post-Setup
 
-## Bootstrap
-
-```bash
-ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aahoughton/dotfiles --ssh
-```
-
-Prerequisites: Homebrew installed, SSH key added (`ssh-add`).
-
-## Automated
-
-After the bootstrap above, the following are handled automatically:
+After running the bootstrap from [README.md](README.md), the following are handled automatically:
 
 - Machine name (prompted during `chezmoi init`)
 - Homebrew packages and casks
@@ -34,3 +23,10 @@ After the bootstrap above, the following are handled automatically:
 5. LaunchBar: hide dock icon
 6. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
 7. **Behemoth only:** Start OrbStack, then run `setup-atuin-server` to start the atuin sync server. Then `atuin register` / `atuin login` on each machine.
+
+## Optional Software
+
+Not included in the automated install — evaluate per-machine:
+
+- **Transcription:** [superwhisper](https://superwhisper.com) or [Fluid Voice](https://github.com/altic-dev/FluidVoice)
+- **Menu bar management:** Barbee (App Store)

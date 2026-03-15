@@ -60,7 +60,6 @@ packages:
       - 'rectangle-pro'
       - 'slack'
       - 'tailscale-app'
-      - 'superwhisper'
       - 'visual-studio-code'
       - 'zoom'
 
