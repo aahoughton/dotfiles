@@ -1,0 +1,17 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+set -e
+
+DESIRED_NAME={{ .machineName | quote }}
+
+# Set all three macOS hostname layers
+if [ "$(scutil --get ComputerName 2>/dev/null)" != "$DESIRED_NAME" ]; then
+    sudo scutil --set ComputerName "$DESIRED_NAME"
+fi
+if [ "$(scutil --get HostName 2>/dev/null)" != "$DESIRED_NAME" ]; then
+    sudo scutil --set HostName "$DESIRED_NAME"
+fi
+if [ "$(scutil --get LocalHostName 2>/dev/null)" != "$DESIRED_NAME" ]; then
+    sudo scutil --set LocalHostName "$DESIRED_NAME"
+fi
+{{ end -}}

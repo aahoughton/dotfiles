@@ -1,27 +1,23 @@
 # Initial Mac Setup
 
-## System Settings
+After `chezmoi init && chezmoi apply`, the following are handled automatically:
 
-1. Change machine name (System Settings > General > About > Name)
-2. Turn on SSH (System Settings > General > Sharing > Remote Login)
-3. Use Quad9 DNS (9.9.9.9, System Settings > Network > Wi-Fi > <SSID> > Details)
-4. Remove spotlight keyboard shortcuts (System Settings > Keyboard > Keyboard Shortcuts... > Spotlight)
-5. Use Function Keys (System Settings > Keyboard > Keyboard Shortcuts... > Function Keys)
-6. Turn on Tap-to-Click (System Settings > Trackpad > Tap to Click)
-7. Show Battery Percentage (System Settings > Menu Bar > Battery > Battery Options...)
-8. Show Sound Settings (System Settings > Menu Bar > Sound)
+- Machine name (prompted during `chezmoi init`)
+- Homebrew packages and casks
+- Default shell set to fish
+- SSH / Remote Login enabled
+- Dock: autohide, hide recents
+- Trackpad: tap to click
+- Function keys as standard function keys
+- Spotlight keyboard shortcuts disabled
+- Battery percentage in menu bar
+- Sound in menu bar
+- Menubar spacing (compact)
 
-## Additional
+## Manual Steps
 
-- go through each installed cask and finalize setup
-- coteditor: set it as handler for txt and md files
-- dock: automatically show / hide
-- dock: do not show recent / suggested
-- launcher: hide dock icon
-- backblaze: install manually (cask doesn't appear to work) and add orbstack data directory to excluded
-- menubar spacing:
-  ```
-  defaults -currentHost write -globalDomain NSStatusItemSpacing -int 0
-  defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 0
-  killall ControlCenter
-  ```
+1. Use Quad9 DNS (System Settings > Network > Wi-Fi > <SSID> > Details)
+2. Go through each installed cask and finalize setup
+3. CotEditor: set as handler for .txt and .md files
+4. LaunchBar: hide dock icon
+5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory

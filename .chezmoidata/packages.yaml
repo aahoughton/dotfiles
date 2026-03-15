@@ -45,7 +45,6 @@ packages:
       - 'ghostty'
       - 'claude-code'
       - 'jump-desktop'
-      - 'jump-desktop-connect'
       - 'kaleidoscope'
       - 'keka'
       - 'intellij-idea'

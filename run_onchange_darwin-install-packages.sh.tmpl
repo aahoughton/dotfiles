@@ -8,6 +8,14 @@ brew {{ . | quote }}
 {{ range .packages.darwin.casks -}}
 cask {{ . | quote }}
 {{ end -}}
+{{- $typeKey := printf "packages_%s" .machineType -}}
+{{- $typeData := index . $typeKey | default dict -}}
+{{- $darwin := index $typeData "darwin" | default dict -}}
+{{- range index $darwin "brews" | default list -}}
+brew {{ . | quote }}
+{{ end -}}
+{{- range index $darwin "casks" | default list -}}
+cask {{ . | quote }}
+{{ end -}}
 EOF
 {{ end -}}
-

@@ -1,0 +1,22 @@
+## Prefer directory-local results, then fall back to global
+filter_mode = "global"
+filter_mode_shell_up_key_binding = "directory"
+search_mode = "fuzzy"
+
+## Tab puts the command in the prompt for editing, Enter executes immediately
+enter_accept = false
+
+## Show a preview of long commands
+show_preview = true
+max_preview_height = 4
+
+## Don't store commands prefixed with a space
+secrets_filter = true
+
+## Keep the search inline rather than fullscreen
+style = "compact"
+inline_height = 40
+
+[search]
+## Directory first so local commands rank higher, but global is still available
+filters = ["directory", "host", "global"]

@@ -1,0 +1,5 @@
+packages_desktop:
+  darwin:
+    brews: []
+    casks:
+      - 'jump-desktop-connect'

@@ -1,0 +1,16 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+set -e
+
+FISH_PATH="$(brew --prefix)/bin/fish"
+
+# Add fish to allowed shells if not already there
+if ! grep -qF "$FISH_PATH" /etc/shells; then
+    echo "$FISH_PATH" | sudo tee -a /etc/shells
+fi
+
+# Change shell if not already fish
+if [ "$SHELL" != "$FISH_PATH" ]; then
+    chsh -s "$FISH_PATH"
+fi
+{{ end -}}

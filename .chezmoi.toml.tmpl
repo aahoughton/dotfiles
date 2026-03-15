@@ -1,3 +1,10 @@
+{{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop/server)" -}}
+{{- $machineName := promptStringOnce . "machineName" "Machine name (e.g. aah-mbp)" -}}
+
+[data]
+    machineType = {{ $machineType | quote }}
+    machineName = {{ $machineName | quote }}
+
 [onepassword]
     mode = "service"
 [hooks.read-source-state.pre]
