@@ -28,5 +28,10 @@ function fish_prompt --description 'Write out the prompt'
         # Handle VCS prompt
         set -g __fish_git_prompt_show_informative_status true
     
-        echo -n -s (prompt_login)' ' (set_color $color_cwd) (prompt_pwd) $normal (fish_vcs_prompt) $normal " "$prompt_status $suffix " "
+        set -l aws_profile_str
+        if set -q AWS_PROFILE
+                set aws_profile_str " ["(set_color bryellow)"$AWS_PROFILE"$normal"]"
+        end
+
+        echo -n -s (prompt_login)' ' (set_color $color_cwd) (prompt_pwd) $normal (fish_vcs_prompt) $normal " "$prompt_status$aws_profile_str $suffix " "
 end
