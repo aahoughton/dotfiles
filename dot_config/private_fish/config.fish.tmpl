@@ -8,9 +8,10 @@ if status is-interactive
     type -q atuin && atuin init fish | source
 
     # Editor aliases
-    if type -q nvim
+    if type -q hx
         alias vi hx
         alias vim hx
+        set -gx VISUAL hx
         set -gx EDITOR hx
     end
 
