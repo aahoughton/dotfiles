@@ -7,11 +7,24 @@
 # about case-insensitive branch name conflicts.
 #
 # Usage:
-#   gitsync [directory]    (defaults to current directory)
+#   gitsync [-d depth] [-n] [directory]    (defaults to depth 1, current directory)
+#     -n  dry run: list repos that would be synced
 
 # ANSI Color Codes
 RED='\033[0;31m'
 NC='\033[0m'
+
+DEPTH=1
+DRY_RUN=false
+
+while getopts "d:n" opt; do
+    case $opt in
+        d) DEPTH="$OPTARG" ;;
+        n) DRY_RUN=true ;;
+        *) echo "Usage: gitsync [-d depth] [-n] [directory]"; exit 1 ;;
+    esac
+done
+shift $((OPTIND - 1))
 
 TARGET_DIR="${1:-.}"
 
@@ -23,14 +36,24 @@ fi
 # Move to the target directory and hide the stack output
 pushd "$TARGET_DIR" > /dev/null || exit
 
-REPO_COUNT=$(find . -maxdepth 2 -name ".git" | wc -l | xargs)
-echo "Processing $REPO_COUNT directories..."
+# Find git repos up to DEPTH levels deep. When a repo is found, prune so
+# nested repos (submodules, monorepo children) are skipped.
+REPOS=()
+while IFS= read -r dir; do
+    REPOS+=("$dir")
+done < <(find . -maxdepth "$DEPTH" -type d -exec test -d "{}/.git" \; -print -prune | sort)
+
+echo "Processing ${#REPOS[@]} directories..."
 
 WARNINGS=()
 
-for repo_path in ./*/.git; do
-    repo=$(dirname "$repo_path")
+for repo in "${REPOS[@]}"; do
     repo_name=${repo#./}
+
+    if $DRY_RUN; then
+        echo "$repo_name"
+        continue
+    fi
 
     # Enter the repo
     if pushd "$repo" > /dev/null; then
