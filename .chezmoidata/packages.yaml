@@ -43,6 +43,7 @@ packages:
       - 'fastmail'
       - 'firefox'
       - 'ghostty'
+      - 'hyperkey'
       - 'claude-code'
       - 'jump-desktop'
       - 'kaleidoscope'
