@@ -44,7 +44,6 @@ packages:
       - 'firefox'
       - 'ghostty'
       - 'hyperkey'
-      - 'claude-code'
       - 'jump-desktop'
       - 'kaleidoscope'
       - 'keka'
