@@ -68,7 +68,13 @@ for repo in "${REPOS[@]}"; do
             WARNINGS+=("${RED}[!] $repo_name: Could not checkout $DEFAULT_BRANCH (dirty working tree?)${NC}")
         else
             # 2. Update
-            git pull --quiet &>/dev/null
+            PULL_OUTPUT=$(git pull --quiet 2>&1)
+            PULL_RC=$?
+            if [ $PULL_RC -ne 0 ]; then
+                WARNINGS+=("${RED}[!] $repo_name: git pull failed: $PULL_OUTPUT${NC}")
+            elif [ -n "$PULL_OUTPUT" ]; then
+                echo "  $PULL_OUTPUT"
+            fi
             git remote prune origin --quiet &>/dev/null
 
             # 3. Safe Cleanup: Merged + Gone branches
