@@ -12,8 +12,13 @@ Host github.com
     AddKeysToAgent yes
 
 {{- if ne .chezmoi.hostname "behemoth" }}
-Host behemoth behemoth.tailbc6344.ts.net
+Host behemoth
     HostName behemoth.local
+    User aah
+    IdentityFile ~/.ssh/behemoth_ed25519
+    AddKeysToAgent yes
+Host behemoth.tailnet
+    HostName behemoth.tailbc6344.ts.net
     User aah
     IdentityFile ~/.ssh/behemoth_ed25519
     AddKeysToAgent yes
