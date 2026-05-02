@@ -1,9 +1,23 @@
 function git-branch-status
-    # Per-branch status vs. origin: in sync / ahead / behind / diverged,
-    # or — if the upstream is gone — try to find the squash-merge commit
-    # on `main` via patch-id and surface the PR number.
+    # Show, for each local branch, where it stands relative to its upstream on
+    # origin: in sync / ahead / behind / diverged, or — if the upstream has
+    # been deleted — which PR integrated it.
+    #
+    # Why: after a few weeks of branch work, `git branch -vv` flags merged
+    # branches as "[gone]" but doesn't tell you *what* they became. This
+    # function identifies the integrating commit on main — via parent-of-merge
+    # for real merge commits, or `git patch-id` for squash / rebase merges —
+    # and surfaces the PR number with a link.
+    #
+    # Sample output:
+    #     ISS-183                832cdd8  merged in #313 — https://github.com/org/repo/pull/313
+    #     ISS-956_libraries      5a229dc  merged in #303 — https://github.com/org/repo/pull/303
+    #     ISS-40_kafka           7001540  in sync with origin/ISS-40_kafka
+    #     old-cleanup            abe7360  upstream gone, branch predates scan window (try -a or larger -n)
+    #   * main                   3f86ee4  in sync with origin/main
+    #     saved-state            f8e6272  no upstream
 
-    argparse 'n/depth=' 'a/all' 'no-fetch' 'h/help' -- $argv
+    argparse 'n/depth=' a/all no-fetch h/help -- $argv
     or return 2
 
     if set -q _flag_help
