@@ -34,7 +34,6 @@ packages:
       - '1password-cli' #should be covered by the pre-install script, but shrug
       - 'bloom'
       - 'cardhop'
-      - 'coteditor'
       - 'daisydisk'
       - 'dash'
       - 'discord'
@@ -44,6 +43,7 @@ packages:
       - 'firefox'
       - 'ghostty'
       - 'hyperkey'
+      - 'jetbrains-toolbox'
       - 'jump-desktop'
       - 'kaleidoscope'
       - 'keka'
@@ -52,7 +52,7 @@ packages:
       - 'nickustinov/tap/itsypad'
       - 'launchbar'
       - 'little-snitch'
-      - 'markedit'
+      - 'lm-studio'
       - 'modern-csv'
       - 'orbstack'
       - 'pdf-expert'
@@ -60,7 +60,7 @@ packages:
       - 'rectangle-pro'
       - 'slack'
       - 'tailscale-app'
-      - 'visual-studio-code'
+      - 'zed'
       - 'zoom'
 
   linux:

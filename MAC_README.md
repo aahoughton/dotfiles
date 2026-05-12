@@ -19,10 +19,9 @@ After running the bootstrap from [README.md](README.md), the following are handl
 1. Disable Apple's built-in password manager: System Settings > Passwords > Password Options > uncheck "Autofill Passwords and Passkeys"
 2. Use Quad9 DNS (System Settings > Network > Wi-Fi > <SSID> > Details)
 3. Go through each installed cask and finalize setup
-4. CotEditor: set as handler for .txt and .md files
-5. LaunchBar: hide dock icon
-6. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
-7. **Behemoth only:** Start OrbStack, then run `setup-atuin-server` to start the atuin sync server. Then `atuin register` / `atuin login` on each machine.
+4. LaunchBar: hide dock icon
+5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
+6. **Behemoth only:** Start OrbStack, then run `setup-atuin-server` to start the atuin sync server. Then `atuin register` / `atuin login` on each machine.
 
 ## Optional Software
 
