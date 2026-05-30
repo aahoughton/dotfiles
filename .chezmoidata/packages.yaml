@@ -22,7 +22,6 @@ packages:
       - 'mise'
       - 'libpq'
       - 'nmap'
-      - 'proctools'
       - 'skills'
       - 'tcpflow'
       - 'watch'
