@@ -68,19 +68,24 @@ function asp --description 'Set AWS Profile and login via SSO'
         return 0
     end
 
+    # Non-SSO profile: no session to log into — just verify static credentials
+    if not __asp_is_sso_profile $profile
+        if aws sts get-caller-identity &>/dev/null
+            echo "AWS_PROFILE set to $profile (credentials valid)"
+            return 0
+        end
+        echo "Error: profile '$profile' is not SSO-configured and has no valid credentials." >&2
+        __asp_rollback $old_profile
+        return 1
+    end
+
     echo "SSO session expired, logging in..."
     if aws sso login $login_args
         echo "AWS_PROFILE set to $profile"
     else
         set -l login_status $status
         echo "Error: SSO login failed (exit code: $login_status)." >&2
-        if test -n "$old_profile"
-            set -gx AWS_PROFILE $old_profile
-            echo "Rolling back to previous profile: $old_profile" >&2
-        else
-            set -e AWS_PROFILE
-            echo "Unsetting AWS_PROFILE." >&2
-        end
+        __asp_rollback $old_profile
         return 1
     end
 end
@@ -106,12 +111,33 @@ function __asp_sso_token_file --argument-names profile
     end
 
     # Fallback: if exactly one SSO token is cached, use it.
-    set -l files (grep -l accessToken ~/.aws/sso/cache/*.json 2>/dev/null)
-    if test (count $files) -eq 1
-        echo $files[1]
-        return 0
+    set -l cache ~/.aws/sso/cache/*.json
+    if test (count $cache) -gt 0
+        set -l files (grep -l accessToken $cache 2>/dev/null)
+        if test (count $files) -eq 1
+            echo $files[1]
+            return 0
+        end
     end
     return 1
+end
+
+# True if the profile is configured for SSO (sso_start_url or sso_session).
+function __asp_is_sso_profile --argument-names profile
+    set -l url (aws configure get sso_start_url --profile $profile 2>/dev/null)
+    set -l sess (aws configure get sso_session --profile $profile 2>/dev/null)
+    test -n "$url"; or test -n "$sess"
+end
+
+# Restore (or unset) AWS_PROFILE after a failed switch.
+function __asp_rollback --argument-names old_profile
+    if test -n "$old_profile"
+        set -gx AWS_PROFILE $old_profile
+        echo "Rolling back to previous profile: $old_profile" >&2
+    else
+        set -e AWS_PROFILE
+        echo "Unsetting AWS_PROFILE." >&2
+    end
 end
 
 # Echo the epoch at which a profile's SSO session expires (nothing if unknown).
