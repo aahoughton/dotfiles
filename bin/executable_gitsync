@@ -67,11 +67,16 @@ for repo in "${REPOS[@]}"; do
         if ! git checkout "$DEFAULT_BRANCH" &>/dev/null; then
             WARNINGS+=("${RED}[!] $repo_name: Could not checkout $DEFAULT_BRANCH (dirty working tree?)${NC}")
         else
-            # 2. Update
-            PULL_OUTPUT=$(git pull --quiet 2>&1)
-            PULL_RC=$?
+            # 2. Update (retry transient SSH/network resets with backoff)
+            PULL_RC=1
+            for attempt in 1 2 3; do
+                PULL_OUTPUT=$(git pull --quiet 2>&1)
+                PULL_RC=$?
+                [ $PULL_RC -eq 0 ] && break
+                sleep $((attempt * 2))
+            done
             if [ $PULL_RC -ne 0 ]; then
-                WARNINGS+=("${RED}[!] $repo_name: git pull failed: $PULL_OUTPUT${NC}")
+                WARNINGS+=("${RED}[!] $repo_name: git pull failed after 3 attempts: $PULL_OUTPUT${NC}")
             elif [ -n "$PULL_OUTPUT" ]; then
                 echo "  $PULL_OUTPUT"
             fi
@@ -79,10 +84,10 @@ for repo in "${REPOS[@]}"; do
 
             # 3. Safe Cleanup: Merged + Gone branches
             # Finds branches that are gone on remote AND merged into current HEAD
-            MERGED_GONE=$(git branch -vv | grep ': gone]' | awk '{print $1}' | grep -v '*' | xargs -I {} git branch --merged | grep "^{}$")
-            if [ -n "$MERGED_GONE" ]; then
-                echo "$MERGED_GONE" | xargs git branch -d &>/dev/null
-            fi
+            while IFS= read -r b; do
+                [ -n "$b" ] && git branch -d "$b" &>/dev/null
+            done < <(git branch -vv | awk '/: gone]/ && $1 != "*" {print $1}' \
+                       | while read -r br; do git branch --merged | grep -qx "  $br" && echo "$br"; done)
         fi
 
         # 4. Case-insensitive check
