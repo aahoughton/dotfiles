@@ -1,13 +1,15 @@
 ---
 name: arch-review
 description: >
-  Performs a deep architectural review of a codebase, evaluating composability,
-  testability, and structural design. Use this skill when the user asks to review
-  a repo, audit architecture, find structural issues, assess code quality at a
-  system level, or evaluate design decisions. Triggers on phrases like "review
-  the architecture", "audit this codebase", "what's wrong with this repo",
-  "assess the design", or "what would be hard to change here". Spawns three
-  parallel specialist agents and returns a single prioritized issue list.
+  Performs a deep architectural review of an entire codebase as it currently
+  stands, evaluating composability, testability, and structural design. Use this
+  skill when the user asks to audit architecture, find structural issues, assess
+  code quality at a system level, or evaluate design decisions. Triggers on
+  phrases like "review the architecture", "audit this codebase", "what's wrong
+  with this repo", "assess the design", or "what would be hard to change here".
+  Reviews the whole repo, not a diff — for reviewing the changes on a branch
+  before merging, use branch-review instead. Spawns three parallel specialist
+  agents and returns a single prioritized issue list.
 ---
 
 # Architectural Review
