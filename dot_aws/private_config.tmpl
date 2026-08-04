@@ -3,27 +3,27 @@ region = us-west-2
 output = json
 
 [sso-session roarmouse]
-sso_start_url = https://identitycenter.amazonaws.com/REDACTED-SSO-INSTANCE-ID
+sso_start_url = {{ .awsSsoStartUrl }}
 sso_region = us-west-2
 sso_registration_scopes = sso:account:access
 
 [profile admin]
 sso_session = roarmouse
-sso_account_id = REDACTED-AWS-ACCOUNT-ID
+sso_account_id = {{ .awsAccountId }}
 sso_role_name = AdministratorAccess
 region = us-west-2
 output = json
 
 [profile poweruser]
 sso_session = roarmouse
-sso_account_id = REDACTED-AWS-ACCOUNT-ID
+sso_account_id = {{ .awsAccountId }}
 sso_role_name = PowerUserAccess
 region = us-west-2
 output = json
 
 [profile readonly]
 sso_session = roarmouse
-sso_account_id = REDACTED-AWS-ACCOUNT-ID
+sso_account_id = {{ .awsAccountId }}
 sso_role_name = ReadOnlyAccess
 region = us-west-2
 output = json

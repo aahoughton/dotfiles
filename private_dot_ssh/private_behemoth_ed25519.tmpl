@@ -1,5 +1,1 @@
-{{- range (onepassword "behemoth_ed25519" "Service Credentials").fields -}}
-{{-   if and (eq .label "private key") -}}
-{{ .value }}
-{{ end -}}
-{{- end -}}
+{{ onepasswordRead "op://Service Credentials/behemoth_ed25519/private key" }}

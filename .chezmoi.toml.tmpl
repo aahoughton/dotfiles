@@ -1,16 +1,30 @@
 {{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop/server)" -}}
 {{- $machineName := promptStringOnce . "machineName" "Machine name (e.g. aah-mbp)" -}}
+{{- /* The trailing "" is the default and is load-bearing: without it,
+       promptStringOnce returns the prompt text itself when there is no tty,
+       so a non-interactive init would write that string into .aws/config. */}}
+{{- $awsAccountId := promptStringOnce . "awsAccountId" "AWS account ID (blank to skip AWS config)" "" -}}
+{{- $awsSsoStartUrl := promptStringOnce . "awsSsoStartUrl" "AWS SSO start URL (blank to skip)" "" -}}
 
 [data]
     machineType = {{ $machineType | quote }}
     machineName = {{ $machineName | quote }}
+    awsAccountId = {{ $awsAccountId | quote }}
+    awsSsoStartUrl = {{ $awsSsoStartUrl | quote }}
 
 [onepassword]
+{{- /* Servers are headless: a service-account token is the only option there.
+       Interactive machines use the desktop app, so unlocking is a Touch ID
+       prompt rather than a long-lived token that has to be exported first.
+       Service accounts also cannot read the built-in Private vault. */}}
+{{- if eq $machineType "server" }}
     mode = "service"
+{{- else }}
+    mode = "account"
+{{- end }}
 [hooks.read-source-state.pre]
     command = ".local/share/chezmoi/.install-password-manager.sh"
 [git]
     autoAdd = false
     autoCommit = false
     autoPush = false
-

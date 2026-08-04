@@ -1,7 +1,3 @@
-{{- if eq .chezmoi.hostname "behemoth" -}}
-{{- range (onepassword "behemoth_ed25519" "Service Credentials").fields -}}
-{{-   if eq .label "public key" -}}
-{{ .value }}
-{{ end -}}
-{{- end -}}
-{{- end -}}
+{{ if eq .chezmoi.hostname "behemoth" -}}
+{{ onepasswordRead "op://Service Credentials/behemoth_ed25519/public key" }}
+{{- end }}

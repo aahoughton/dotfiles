@@ -6,3 +6,36 @@ scripts/
 .config/atuin/docker-compose.yaml
 {{ end }}
 
+{{/*
+  Bootstrap gate.
+
+  1Password-backed files are skipped until `op` can actually authenticate, so a
+  fresh machine's first apply never fails on a secret it cannot reach yet. That
+  first run installs packages (including the 1Password app) and lands every
+  non-secret config; sign in, re-run `chezmoi apply`, and these files appear.
+
+  This is evaluated on every apply rather than stored in chezmoi's config data,
+  which is read once at init — so picking up the secrets needs no re-init.
+
+  `output` fails the whole template on a non-zero exit, hence the `|| echo`
+  guard. `lookPath` returns an empty string rather than erroring when absent.
+*/}}
+{{- $opReady := false -}}
+{{- if lookPath "op" -}}
+{{-   $opReady = eq (output "sh" "-c" "op whoami >/dev/null 2>&1 && echo ready || echo notready" | trim) "ready" -}}
+{{- end -}}
+{{ if not $opReady }}
+.ssh/behemoth_ed25519
+.ssh/github_ed25519
+.ssh/authorized_keys
+{{ end }}
+
+{{/* AWS identifiers come from init prompts, not 1Password — they are not
+     secrets, and prompting keeps .aws/config out of the gate above.
+
+     `get` rather than `.awsAccountId` so a machine initialised before these
+     prompts existed skips the file instead of failing the whole template.
+     Run `chezmoi init` on such a machine to be prompted for the values. */}}
+{{ if not (get . "awsAccountId") }}
+.aws/config
+{{ end }}
