@@ -17,15 +17,19 @@
     awsSsoStartUrl = {{ $awsSsoStartUrl | quote }}
 
 [onepassword]
-{{- /* Servers are headless: a service-account token is the only option there.
-       Interactive machines use the desktop app, so unlocking is a Touch ID
-       prompt rather than a long-lived token that has to be exported first.
-       Service accounts also cannot read the built-in Private vault. */}}
-{{- if eq $machineType "server" }}
-    mode = "service"
-{{- else }}
-    mode = "account"
-{{- end }}
+{{- /* How you authenticate to 1Password is a separate question from what kind
+       of machine this is: behemoth is a desktop with a GUI that is also driven
+       headlessly over ssh. machineType additionally selects package sets
+       (packages_<type>), so it must not be bent to mean "headless".
+
+       account = 1Password desktop app, unlocked interactively.
+       service = OP_SERVICE_ACCOUNT_TOKEN, the only option with no GUI.
+
+       These are mutually exclusive: chezmoi errors in account mode if the
+       token is set, and in service mode if it is not. A machine with a GUI
+       should stay on account and simply not export the token -- applying it
+       over ssh skips the vault-backed files rather than failing. */}}
+    mode = {{ promptStringOnce . "onepasswordMode" "1Password mode (account = desktop app, service = token)" (ternary "service" "account" (eq $machineType "server")) | quote }}
 [hooks.read-source-state.pre]
     command = ".local/share/chezmoi/.install-password-manager.sh"
 [git]

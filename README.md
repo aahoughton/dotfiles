@@ -38,10 +38,19 @@ SSH keys and `authorized_keys` land on this second pass. `.chezmoiignore` checks
 whether `op` can authenticate on every apply, so nothing needs re-running beyond
 `chezmoi apply` itself.
 
-Interactive machines use 1Password's `account` mode (desktop app, Touch ID);
-`server` machines use `service` mode. That's picked from the machine type
-answered at init. Note service accounts cannot read the built-in Private vault —
-anything they need must live in a custom vault, currently `Service Credentials`.
+`chezmoi init` asks which 1Password mode to use, defaulting to `service` for a
+`server` machine type and `account` otherwise. The two are mutually exclusive:
+chezmoi errors in `account` mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, and in
+`service` mode if it isn't. So on an `account` machine, don't export the token.
+
+This is deliberately a separate question from the machine type, which also picks
+package sets (`packages_<type>`). behemoth is a `desktop` — it has a GUI — but is
+often driven headlessly over ssh. It stays on `account` mode: applying over ssh
+can't reach the desktop app, so the gate skips the vault-backed files and the
+apply still succeeds. Run the applies that need keys while sitting at it.
+
+Service accounts cannot read the built-in Private vault, so anything they need
+must live in a custom vault — currently `Service Credentials`.
 
 ### Post-install
 
@@ -73,8 +82,13 @@ before that change won't have them, and will skip `.aws/config` until re-prompte
 
 ```bash
 chezmoi init          # re-prompts for the new values, keeps existing answers
+chezmoi diff          # check nothing local gets reverted
 chezmoi apply
 ```
+
+`init` also asks for the 1Password mode. Accept the default unless the machine
+has no GUI. Note this changes the laptop from `service` to `account`: it had a
+hardcoded `service` mode before the mode became a per-machine choice.
 
 History was rewritten on 2026-08-03 to redact AWS identifiers, so every commit
 SHA changed. Any clone predating that has an unrelated history and will try to
