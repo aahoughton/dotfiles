@@ -1,5 +1,9 @@
-{{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop/server)" -}}
-{{- $machineName := promptStringOnce . "machineName" "Machine name (e.g. aah-mbp)" -}}
+{{- /* Every prompt passes an explicit default. Without one promptStringOnce
+       returns the prompt text itself when there is no tty, which would set
+       machineType to a string that is not "server" and so silently select
+       account mode on a headless box. */}}
+{{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop/server)" "" -}}
+{{- $machineName := promptStringOnce . "machineName" "Machine name (e.g. aah-mbp)" "" -}}
 {{- /* The trailing "" is the default and is load-bearing: without it,
        promptStringOnce returns the prompt text itself when there is no tty,
        so a non-interactive init would write that string into .aws/config. */}}
