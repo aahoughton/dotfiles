@@ -155,8 +155,16 @@ machine-local override rather than re-applying over it each time.
 Commit from the source directory:
 ```bash
 cd ~/.local/share/chezmoi
+git status --short          # look at untracked files before staging
 git add -A && git commit && git push
 ```
+
+`git add -A` will happily stage anything `chezmoi add` left in the source
+directory on that machine, and this repo is public. Check `git status` first —
+`chezmoi add` on a file holding tokens or host details creates a source file
+that looks like every other one. If a target already has a `modify_` script,
+adding it again also produces two source entries for one target, which fails
+with `inconsistent state` until one is removed.
 
 ## Tools and language management
 
