@@ -1,0 +1,55 @@
+#!/bin/sh
+# Claude Code rewrites ~/.claude/settings.json at runtime — toggling plugins,
+# changing theme/model via /config — so chezmoi cannot own the whole file
+# without fighting it for every edit.
+#
+# As a modify_ script this receives the current file on stdin and writes the
+# new contents to stdout, so it enforces only the keys below and passes
+# everything else through untouched. enabledPlugins in particular stays under
+# Claude Code's control (and scripts/install-claude-plugins.sh), as does any
+# key a future version adds.
+
+set -eu
+
+input=$(cat)
+
+# Nothing to preserve on a fresh machine.
+[ -n "$input" ] || input='{}'
+
+# jq is installed by run_onchange_*-install-packages.sh, which sorts after
+# .claude/ in the apply order — so the first apply on a new machine can reach
+# this script before jq exists. Emit the managed keys and let a later apply
+# fill in the rest rather than failing the whole run.
+if ! command -v jq >/dev/null 2>&1; then
+    if [ "$input" = '{}' ]; then
+        cat <<'EOF'
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
+  },
+  "tui": "fullscreen",
+  "skipAutoPermissionPrompt": true,
+  "agentPushNotifEnabled": true
+}
+EOF
+    else
+        printf '%s' "$input"
+    fi
+    exit 0
+fi
+
+# Malformed JSON is left exactly as found; clobbering it would lose whatever
+# Claude Code was mid-write on, and the error is more useful than a silent reset.
+if ! printf '%s' "$input" | jq empty >/dev/null 2>&1; then
+    printf '%s' "$input"
+    echo "chezmoi: ~/.claude/settings.json is not valid JSON; left unchanged" >&2
+    exit 0
+fi
+
+printf '%s' "$input" | jq '
+      .statusLine = {"type": "command", "command": "~/.claude/statusline-command.sh"}
+    | .tui = "fullscreen"
+    | .skipAutoPermissionPrompt = true
+    | .agentPushNotifEnabled = true
+'

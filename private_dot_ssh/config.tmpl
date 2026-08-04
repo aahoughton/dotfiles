@@ -4,6 +4,13 @@
 # This won't be added again if you remove it.
 Include ~/.orbstack/ssh/config
 {{ end }}
+# --- Machine-local hosts ---
+# Anything not shared across machines (or not for a public repo) goes here.
+# Included above every block below so it can override them; ssh takes the
+# first value it sees for each parameter. Missing file is not an error.
+
+Include ~/.ssh/config.local
+
 # --- GitHub ---
 
 Host github.com
@@ -30,4 +37,7 @@ Host behemoth.tailnet
 
 Host *
     AddKeysToAgent yes
+    ServerAliveInterval 15
+    ServerAliveCountMax 4
+    TCPKeepAlive yes
 
