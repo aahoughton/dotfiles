@@ -20,16 +20,20 @@ Host github.com
 
 {{- if ne .chezmoi.hostname "behemoth" }}
 # --- Behemoth (personal) ---
+# One name from anywhere. On the home LAN, resolve via mDNS and skip the
+# WireGuard tunnel: Tailscale does route over the LAN when both peers are on
+# it, but userspace WireGuard plus the 1280 MTU still costs ~30-50% of bulk
+# throughput, and the mDNS path keeps working when Tailscale is off.
+# Off the home LAN, HostName defaults to the bare name, which MagicDNS
+# resolves via the tailnet search domain.
 
-Host behemoth behemoth.tailnet
-    User aah
-    IdentityFile ~/.ssh/behemoth_ed25519
-
-Host behemoth
+Match host behemoth localnetwork 192.168.86.0/24
     HostName behemoth.local
 
-Host behemoth.tailnet
-    HostName behemoth.tailbc6344.ts.net
+Host behemoth
+    User aah
+    IdentityFile ~/.ssh/behemoth_ed25519
+    HostKeyAlias behemoth
 {{ end }}
 # --- Defaults for all hosts ---
 # Must come last: ssh_config uses first-match-wins per parameter, so this
