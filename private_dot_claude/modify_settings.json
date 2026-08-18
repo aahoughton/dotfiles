@@ -47,9 +47,26 @@ if ! printf '%s' "$input" | jq empty >/dev/null 2>&1; then
     exit 0
 fi
 
+# The review gate is merged rather than assigned, so a hook added later
+# through /hooks survives. Any existing entry naming the same script is
+# dropped first, which makes this idempotent across applies.
 printf '%s' "$input" | jq '
       .statusLine = {"type": "command", "command": "~/.claude/statusline-command.sh"}
     | .tui = "fullscreen"
     | .skipAutoPermissionPrompt = true
     | .agentPushNotifEnabled = true
+    | .hooks.PreToolUse = (
+        ((.hooks.PreToolUse // [])
+          | map(.hooks |= map(select(.command != "~/.claude/hooks/require-review-before-commit.sh")))
+          | map(select((.hooks | length) > 0)))
+        + [{
+            "matcher": "Bash",
+            "hooks": [{
+              "type": "command",
+              "command": "~/.claude/hooks/require-review-before-commit.sh",
+              "timeout": 10,
+              "statusMessage": "Checking the staged diff has been reviewed"
+            }]
+          }]
+      )
 '
