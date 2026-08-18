@@ -2,7 +2,8 @@
 name: pare-docs
 description: >
   Cuts bloat from a project's prose documentation — README, guides, package docs —
-  in three passes: necessity, cross-file redundancy, then concision and tone.
+  by first deciding what each file is for, then in three passes: necessity,
+  cross-file redundancy, then concision and tone.
   Written for docs that were drafted with LLM help and carry the usual tells:
   long, conversational, over-complete, redundant across files. Use this skill when
   the user asks to tighten, pare, trim, or de-slop documentation, or says the docs
@@ -40,9 +41,10 @@ match, and neither are the current docs: you're evaluating them, not imitating t
 
 Then establish two things, because every judgment below depends on them:
 
-- **Who the reader is.** A library's docs serve a caller integrating against an API.
-  An application's serve an operator or contributor. A CLI's serve someone at a
-  prompt. "Does the reader need this?" has a different answer for each.
+- **Who the project's readers are.** A library's docs serve a caller integrating
+  against an API. An application's serve an operator or contributor. A CLI's serve
+  someone at a prompt. "Does the reader need this?" has a different answer for each.
+  That's the repo-level answer; Pass 0 narrows it per file.
 - **Where reference material belongs.** Identify the project's doc-comment
   convention from its language and existing source. That's the destination for
   material that Pass 1 pulls out of prose.
@@ -71,9 +73,46 @@ This exists so the user can correct your aggressiveness on one file rather than
 fifteen. Do not skip it, and do not proceed on a "looks good" you inferred rather
 than received. For a single-file scope, skip calibration and just do the work.
 
-## The three passes
+## The passes
 
-Run all three over each file (or each section of a long one).
+Pass 0 decides a file's job once. Run the other three over each file, or over each
+section of a long one.
+
+### Pass 0 — What is this file for?
+
+The same paragraph is bloat in one file and load-bearing in another, so decide the
+file's job before cutting anything in it. The three passes below don't ask on their
+own, and applying one standard across files with different jobs is the most common
+way this skill does damage.
+
+| Job | Reader | Wants |
+|---|---|---|
+| **Landing page** | hasn't adopted this yet; deciding whether to | what it is, what it costs, what it can't do, when not to |
+| **Guide** | has adopted it; doing a task | orientation, recipes, how the pieces compose |
+| **Reference** | knows what they want; checking a detail | the contract, exactly, and nothing around it |
+
+What follows from each:
+
+- **Landing pages keep decision-support, even when a guide repeats it.** Capability
+  tables, costs and limits, comparisons, when-not-to-use, version support. Someone
+  deciding whether to adopt will not click through to find them, so Pass 2 must not
+  dedup them away. Cut manual content instead: recipes and walkthroughs belong in
+  the guide.
+- **Guides keep what doc comments can't hold** — orientation, how pieces fit,
+  non-obvious usage, decisions the reader has to make. This is where Pass 1 bites
+  hardest.
+- **Reference prose that restates the type is deletable outright.** The doc comment
+  is canonical; a second copy in Markdown is a thing that drifts.
+
+**Check whether the file is a published package's landing page**, because it changes
+the reader from "contributor browsing the repo" to "stranger evaluating on a package
+registry". Read the manifest next to it — an npm `package.json` with a `name` and no
+`"private": true`, a `pyproject.toml`, a `Cargo.toml`. Check the **repo root**
+manifest too: a monorepo root is often itself a published package, so the top-level
+README can be a registry landing page and not just the repo's front door.
+
+A file can hold more than one job — a package README that opens as a landing page
+and ends in reference tables is normal. Judge section by section when it does.
 
 ### Pass 1 — Necessity
 
@@ -101,7 +140,13 @@ Canonical-home rules:
 |---|---|
 | Conceptual, how-to | the `docs/` guide |
 | Component-specific API surface | that component's own README |
-| Orientation, quick start | top-level `README.md` — a router, not a manual |
+| Orientation, quick start | top-level `README.md` |
+
+**Decision-support is the exception, and Pass 0 says where.** On a landing page,
+content that helps someone decide whether to adopt the thing stays put even though a
+guide covers it in more depth. Deduping it to a pointer serves a reader who has
+already decided, at the expense of the one who hasn't. Dedup a landing page's
+*recipes*, not its capability tables, costs, limits, or comparisons.
 
 Flag every dedup you make so the user can veto it. Deduping is the pass most likely
 to lose something the user wanted kept in both places.
@@ -136,13 +181,16 @@ For whatever survives:
 Before rewriting, give a diff-style summary with one-line reasons:
 
 ```
-docs/<file>.md — <n> lines
+docs/<file>.md — <n> lines, <landing page | guide | reference>
 
   cut          <what> — <why>
   moved        <what> → <symbol> — <why>
   deduped      <what> → <canonical file> — <why>
   kept         <what> — <why it survived a cut you considered>
 ```
+
+Lead with the Pass 0 verdict. It is the cheapest thing for the user to correct and
+the most expensive to get wrong, since every cut below it inherits the mistake.
 
 Then produce the rewrite. Report line counts before and after, and end the run with
 any code problems you noticed but left alone.
