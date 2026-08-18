@@ -21,12 +21,21 @@ scripts/
   This is evaluated on every apply rather than stored in chezmoi's config data,
   which is read once at init — so picking up the secrets needs no re-init.
 
-  `output` fails the whole template on a non-zero exit, hence the `|| echo`
-  guard. `lookPath` returns an empty string rather than erroring when absent.
+  The check lives in `scripts/op-ready.sh` because it needs a bound and a
+  progress notice, and neither fits in a one-liner. Asking `op whoami` inline
+  with no bound hung every chezmoi command, silently, on a machine where the
+  1Password desktop app was prompting for an approval nobody was looking at.
+  `--debug` stopped after reading this file and said nothing further. A
+  `|| echo notready` guard answers a non-zero exit, which is a different
+  failure from never exiting.
+
+  `output` fails the whole template on a non-zero exit, so the script always
+  exits 0 and puts its verdict on stdout. `lookPath` returns an empty string
+  rather than erroring when absent.
 */}}
 {{- $opReady := false -}}
 {{- if lookPath "op" -}}
-{{-   $opReady = eq (output "sh" "-c" "op whoami >/dev/null 2>&1 && echo ready || echo notready" | trim) "ready" -}}
+{{-   $opReady = eq (output "sh" (joinPath .chezmoi.sourceDir "scripts/op-ready.sh") | trim) "ready" -}}
 {{- end -}}
 {{ if not $opReady }}
 .ssh/behemoth_ed25519
