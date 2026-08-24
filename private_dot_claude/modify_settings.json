@@ -57,15 +57,16 @@ printf '%s' "$input" | jq '
     | .agentPushNotifEnabled = true
     | .hooks.PreToolUse = (
         ((.hooks.PreToolUse // [])
-          | map(.hooks |= map(select(.command != "~/.claude/hooks/require-review-before-commit.sh")))
+          | map(.hooks |= map(select(.command != "~/.claude/hooks/require-review-before-commit.sh"
+                                    and .command != "~/.claude/hooks/require-review-before-push.sh")))
           | map(select((.hooks | length) > 0)))
         + [{
             "matcher": "Bash",
             "hooks": [{
               "type": "command",
-              "command": "~/.claude/hooks/require-review-before-commit.sh",
+              "command": "~/.claude/hooks/require-review-before-push.sh",
               "timeout": 10,
-              "statusMessage": "Checking the staged diff has been reviewed"
+              "statusMessage": "Checking the branch has been reviewed"
             }]
           }]
       )
