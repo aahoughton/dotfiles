@@ -5,6 +5,7 @@ scripts/
 {{/* Machine-local, deliberately unmanaged. Listed so an accidental
      `chezmoi add` cannot pull host entries into a public repo. */}}
 .ssh/config.local
+.config/fish/conf.d/ghostty_tint.local.fish
 
 {{ if ne .chezmoi.hostname "behemoth" }}
 .config/atuin/docker-compose.yaml
