@@ -38,19 +38,7 @@ SSH keys and `authorized_keys` land on this second pass. `.chezmoiignore` checks
 whether `op` can authenticate on every apply, so nothing needs re-running beyond
 `chezmoi apply` itself.
 
-`chezmoi init` asks which 1Password mode to use, defaulting to `service` for a
-`server` machine type and `account` otherwise. The two are mutually exclusive:
-chezmoi errors in `account` mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, and in
-`service` mode if it isn't. So on an `account` machine, don't export the token.
-
-This is deliberately a separate question from the machine type, which also picks
-package sets (`packages_<type>`). behemoth is a `desktop` — it has a GUI — but is
-often driven headlessly over ssh. It stays on `account` mode: applying over ssh
-can't reach the desktop app, so the gate skips the vault-backed files and the
-apply still succeeds. Run the applies that need keys while sitting at it.
-
-Service accounts cannot read the built-in Private vault, so anything they need
-must live in a custom vault — currently `Service Credentials`.
+See [1Password](#1password) for how the modes and the gate work.
 
 ### Post-install
 
@@ -64,10 +52,8 @@ Install Claude Code plugins:
 ~/.local/share/chezmoi/scripts/install-claude-plugins.sh
 ```
 
-Set up atuin sync server (if this machine will host it):
-```bash
-~/.local/share/chezmoi/scripts/setup-atuin-server.sh
-```
+Set up the atuin sync server, if this machine hosts it: see
+[MAC_README](MAC_README.md).
 
 `scripts/` is in `.chezmoiignore`, so it stays in the source directory and is
 never deployed to `$HOME` — always run these by their full path.
@@ -98,6 +84,69 @@ push the old commits back. On each one:
 cd ~/.local/share/chezmoi
 git fetch origin && git reset --hard origin/main
 ```
+
+## 1Password
+
+### How the bootstrap avoids a chicken-and-egg
+
+`op` is needed to read the vault, but installing `op` is itself part of setup.
+Two mechanisms resolve that, and both run before anything can fail on a secret.
+
+A `read-source-state.pre` hook in `.chezmoi.toml.tmpl` runs
+`.install-password-manager.sh`, which installs the 1Password **CLI** (brew on
+macOS, a versioned zip on Linux) before chezmoi parses `.chezmoiignore`. The
+hook path resolves against `$HOME`, so it works from any working directory. A
+missing script is a hard error rather than a silent skip.
+
+`.chezmoiignore` then gates the vault-backed files on `scripts/op-ready.sh`,
+which answers "can `op` authenticate right now?" under a 15s bound. On
+`notready` it skips `.ssh/behemoth_ed25519`, `.ssh/github_ed25519`, and
+`.ssh/authorized_keys`, and the apply otherwise succeeds.
+
+The desktop **app** is a brew cask, installed later with the rest of the
+packages. So the order is: CLI (hook), every non-secret file, app (cask), sign
+in, then secrets on the second apply.
+
+### Modes
+
+`chezmoi init` asks which mode to use, defaulting to `service` for a `server`
+machine type and `account` otherwise. The two are mutually exclusive: chezmoi
+errors in `account` mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, and in `service`
+mode if it isn't. So on an `account` machine, don't export the token.
+
+This is deliberately a separate question from the machine type, which also picks
+package sets (`packages_<type>`). behemoth is a `desktop` (it has a GUI) that is
+often driven headlessly over ssh, and it stays on `account`.
+
+Service accounts cannot read the built-in Private vault, so anything they need
+must live in a custom vault, currently `Service Credentials`.
+
+The mode is read from the config file. `CHEZMOI_ONEPASSWORD_MODE` does **not**
+override it; check with `chezmoi dump-config`. To run one apply in a different
+mode, copy the config, edit `[onepassword] mode`, and use `chezmoi --config`.
+
+### Over ssh
+
+Applying over ssh lands everything except the three key files above. The cause
+is narrower than "the desktop app is unreachable": the CLI has no standalone
+account of its own (`op account list` is empty, `~/.config/op/config` shows
+`"accounts": null`), so it can only authenticate by delegating to the app. Over
+ssh there is nothing to sign in to.
+
+The default posture is to accept that and run the applies that need keys while
+sitting at the machine. Two escape hatches exist if that becomes annoying:
+
+- `op account add` configures a standalone CLI account, after which
+  `eval $(op signin)` works in an ssh session with `mode = "account"`
+  unchanged. This puts the Secret Key on the box and means typing the master
+  password into an ssh session. Reversible with `op account forget`. Never
+  commit the Secret Key; this repo is public.
+- A service account token works headlessly, but needs the keys moved into
+  `Service Credentials` and a config swap, since the modes are exclusive.
+
+Every chezmoi command over ssh pays the full `op-ready.sh` timeout, because in
+this configuration the check can never return `ready`. `CHEZMOI_OP_TIMEOUT` and
+`CHEZMOI_OP_NOTICE_AFTER` tune it.
 
 ## Conventions
 
