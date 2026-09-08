@@ -32,3 +32,12 @@
 [pull]
     rebase = true
 
+{{ $gh := lookPath "gh" -}}
+{{ if $gh -}}
+[credential "https://github.com"]
+	helper =
+	helper = !{{ $gh }} auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !{{ $gh }} auth git-credential
+{{ end -}}
