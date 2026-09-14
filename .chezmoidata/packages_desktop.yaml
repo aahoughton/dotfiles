@@ -1,5 +1,8 @@
 packages_desktop:
   darwin:
-    brews: []
+    brews:
+      # LOCAL LLM
+      - 'hf'
+      - 'llama.cpp'
     casks:
       - 'jump-desktop-connect'
