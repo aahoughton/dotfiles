@@ -1,0 +1,7 @@
+# mdcat renders at min(80, terminal width) by default. full_width lifts the
+# 80-column cap so prose fills the window, which is the reason this file
+# exists: glow can only take a hardcoded width, and `-w 0` disables wrapping
+# rather than following the terminal. mdcat still narrows correctly on a
+# terminal below 80 columns with this set.
+[defaults]
+full_width = true
