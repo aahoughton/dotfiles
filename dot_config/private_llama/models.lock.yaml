@@ -1,0 +1,39 @@
+# Local LLM model lock manifest.
+#
+# Records exactly which weights this machine runs, pinned to immutable Hugging
+# Face revisions and verified by SHA-256. `restore-models.sh` reads this file to
+# rebuild the active model tree from the Dropbox archive, or from Hugging Face
+# if the archive is unavailable.
+#
+# Weights themselves are never stored in chezmoi (they are tens of GB); only
+# this manifest is. Paths use ~ and are expanded by the consuming script.
+
+active_root: ~/Models/LLM
+archive_root: ~/Dropbox/Media/Local-LLM-Archive
+
+# Minimum llama.cpp build. Earlier builds lack the qwen35 architecture and will
+# refuse to load the model with an "unknown model architecture" error.
+min_llama_cpp: "0.4.0"
+
+models:
+  - name: qwen3.8-27b
+    role: primary
+    repo: unsloth/Qwen3.8-27B-GGUF
+    revision: 4ca720788d1e01f1bff70c033e0d0028fd02e502
+    # Short revision is the on-disk directory name under <root>/<repo>/.
+    revision_short: 4ca720788d1e
+    quant: Q8_0
+    upstream_repo: Qwen/Qwen3.8-27B
+    upstream_revision: 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
+    license: Apache-2.0
+    arch: qwen35
+    files:
+      - name: Qwen3.8-27B-Q8_0.gguf
+        role: weights
+        bytes: 29047086048
+        sha256: a680f44a06920e5d689774823782006aa3acc8db95750323373b24139b67e348
+      - name: mmproj-F16.gguf
+        # F16 rather than BF16: better-exercised path on Metal.
+        role: mmproj
+        bytes: 927607488
+        sha256: cbb841a9ee0636b2ec172f5bb8df2ea8dfeb01e90fe7c6126581d662a0b4e43e
