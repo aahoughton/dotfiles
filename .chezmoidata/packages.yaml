@@ -30,6 +30,11 @@ packages:
       - 'yq'
       # LANGUAGES (use mise for most)
       - 'ghc'
+      # node is brew-managed, not mise-managed, on purpose: globally
+      # installed npm CLIs (pi) live in the runtime's prefix, and a
+      # mise version switch would strip them. It was previously present
+      # only as a transitive dependency of skills.
+      - 'node'
     casks:
       - '1password'
       - '1password-cli' #should be covered by the pre-install script, but shrug
