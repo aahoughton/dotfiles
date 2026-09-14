@@ -12,24 +12,19 @@ scripts/
 .pi/agent/sessions
 
 {{/* mdcat's name-based personalities: the same binary paginates as mdless and
-     opens the fzf picker as mdpick. Gated on the OS, not on `lookPath "mdcat"`.
+     opens the fzf picker as mdpick. Gated on the OS, and pointed at a constant
+     path, because every machine here is an arm64 Mac.
 
-     lookPath is wrong here even though it reads as the more careful check.
+     Not `lookPath "mdcat"`, which reads as the more careful check and is wrong.
      .chezmoiignore is evaluated once while reading the source state, before any
      target is applied and before run_onchange installs packages -- so on a
-     machine that did not already have mdcat, the guard fired, the links were
-     ignored for the whole run, and the very same run then installed mdcat. The
-     result was mdcat present and the links missing until a second apply.
+     machine that did not already have mdcat the guard fired, the links were
+     ignored for the whole run, and that same run then installed mdcat. mdcat
+     landed and the links did not, until a second apply.
 
-     The target is derived from the architecture instead of looked up, so it
-     renders on a machine that has not installed mdcat yet. A symlink pointing
-     at a not-yet-installed binary is fine: brew bundle lands it in the same
-     apply, and mdcat is in the darwin package list unconditionally. */}}
-{{ if ne .chezmoi.os "darwin" }}
-bin/mdless
-bin/mdpick
-{{ end }}
-
+     A symlink to a not-yet-installed binary is fine: brew bundle lands mdcat in
+     the same apply, and it is in the darwin package list unconditionally. An
+     Intel Mac or Linux brew would need /usr/local or /home/linuxbrew here. */}}
 {{ if ne .chezmoi.hostname "behemoth" }}
 .config/atuin/docker-compose.yaml
 {{ end }}
