@@ -182,6 +182,14 @@ delete the appended block.
 - `private_dot_claude/skills/` — Claude Code skills, deployed to `~/.claude/skills/`:
   `arch-review` (whole-repo structural audit), `branch-review` (pre-merge checks
   that complement `/code-review`), `pare-docs` (cuts bloat from prose docs).
+- `private_dot_claude/agents/` — Claude Code subagents, deployed to
+  `~/.claude/agents/`: `diff-reviewer` (reviews a staged diff or sha range from
+  fresh context, independent of whoever wrote it).
+- `private_dot_claude/hooks/` — deployed to `~/.claude/hooks/` and wired to
+  nothing. `require-review-before-push.sh` gates `git push` on a recorded review;
+  it is opted into one repo at a time from that repo's own
+  `.claude/settings.local.json`, so the set of gated repos never enters this
+  public tree. The script's header has the JSON and the reasoning.
 - `personal/`, `src/`, `tmp/` — empty directories created on every machine, kept
   by `.chezmoikeep`.
 - `Desktop/` — symlinks to `$HOME` and `~/tmp` for reachability from file dialogs.

@@ -20,6 +20,60 @@
 # Escape hatch: prefix the command with `env SKIP_REVIEW_GATE=1`, or set
 # SKIP_REVIEW_GATE=1 in the environment this hook runs in. See the
 # comment at the check itself for why both exist.
+#
+# WIRING THIS UP
+#
+# Not wired to anything by default. chezmoi installs this script on every
+# machine and leaves it inert, because a gate that fires in every repo
+# taxes the ones where a bad push costs nothing — and taxes them on every
+# added commit, since the marker is keyed to the diff rather than to the
+# branch.
+#
+# Opt in one repository at a time, in that repository's own
+# `.claude/settings.local.json`:
+#
+#     {
+#       "hooks": {
+#         "PreToolUse": [
+#           {
+#             "matcher": "Bash",
+#             "hooks": [
+#               {
+#                 "type": "command",
+#                 "command": "~/.claude/hooks/require-review-before-push.sh",
+#                 "timeout": 10,
+#                 "statusMessage": "Checking the branch has been reviewed"
+#               }
+#             ]
+#           }
+#         ]
+#       }
+#     }
+#
+# Start a new session in that repo afterwards: Claude Code snapshots hooks
+# at startup, so an edit to the file mid-session does not take effect and
+# the gate will appear not to work.
+#
+# `settings.local.json` and not `settings.json`, for two reasons. It is
+# personal and uncommitted (Claude Code adds it to the repo's .gitignore
+# when it first creates the file — worth confirming it did), so opting in
+# does not impose the gate on anyone else working in the repo. And it
+# keeps the list of which repos are gated out of every tree, including
+# the dotfiles repo this script is managed in, which is public and would
+# otherwise publish exactly that list.
+#
+# The price of that privacy is that the opt-in is per machine as well as
+# per repo: a fresh clone on the other machine is ungated until the file
+# is written there too. Nothing syncs it, deliberately.
+#
+# The review markers under ~/.claude/review-markers/ are likewise local,
+# so a branch reviewed on one machine is asked about again on the other.
+#
+# To soften the gate in a given repo rather than skip it, change the
+# `permissionDecision` at the bottom of this script from "deny" to "ask":
+# same prompt and same reasoning, but approvable in one keystroke instead
+# of requiring a review and a marker. That is a per-script setting, not a
+# per-repo one, so it changes every gated repo at once.
 
 set -uo pipefail
 
