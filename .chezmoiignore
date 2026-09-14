@@ -6,9 +6,21 @@ scripts/
      `chezmoi add` cannot pull host entries into a public repo. */}}
 .ssh/config.local
 .config/fish/conf.d/ghostty_tint.local.fish
+.config/llama/api-key
+.pi/agent/auth.json
+.pi/agent/models-store.json
+.pi/agent/sessions
 
 {{ if ne .chezmoi.hostname "behemoth" }}
 .config/atuin/docker-compose.yaml
+{{ end }}
+
+{{/* Local LLM runtime and agent config. Scoped by machine type: a laptop
+     has neither the memory nor the weights to serve these models, and .pi's
+     provider points at a llama-server that only exists on the desktop. */}}
+{{ if ne .machineType "desktop" }}
+.config/llama
+.pi
 {{ end }}
 
 {{/*
