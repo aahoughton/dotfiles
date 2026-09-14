@@ -4,10 +4,16 @@ packages:
       # QUALITY OF LIFE
       - 'atuin'
       - 'bash'
+      - 'fd'
       - 'fish'
+      - 'fzf'
       - 'helix'
       - 'htop'
       - 'jump'
+      # mdcat renders markdown; symlinked in bin/ as mdless (pager) and
+      # mdpick (fzf picker), which is what fzf is here for.
+      - 'mdcat'
+      - 'mosh'
       - 'ripgrep'
       - 'tmux'
       # DEV TOOLING

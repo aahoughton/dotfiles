@@ -11,6 +11,15 @@ scripts/
 .pi/agent/models-store.json
 .pi/agent/sessions
 
+{{/* mdcat's name-based personalities. The symlink targets come from
+     `lookPath "mdcat"`, which is empty when mdcat is not installed — an empty
+     symlink target fails the apply, so skip them rather than emit a broken
+     link. mdcat is in the darwin package list only. */}}
+{{ if not (lookPath "mdcat") }}
+bin/mdless
+bin/mdpick
+{{ end }}
+
 {{ if ne .chezmoi.hostname "behemoth" }}
 .config/atuin/docker-compose.yaml
 {{ end }}
