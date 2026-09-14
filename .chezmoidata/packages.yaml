@@ -38,7 +38,6 @@ packages:
     casks:
       - '1password'
       - '1password-cli' #should be covered by the pre-install script, but shrug
-      - 'bloom'
       - 'cardhop'
       - 'daisydisk'
       - 'dash'
@@ -58,11 +57,8 @@ packages:
       - 'nickustinov/tap/itsypad'
       - 'launchbar'
       - 'little-snitch'
-      - 'lm-studio'
-      - 'modern-csv'
       - 'orbstack'
       - 'pdf-expert'
-      - 'popclip'
       - 'rectangle-pro'
       - 'slack'
       - 'tailscale-app'
