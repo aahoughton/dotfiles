@@ -37,3 +37,29 @@ models:
         role: mmproj
         bytes: 927607488
         sha256: cbb841a9ee0636b2ec172f5bb8df2ea8dfeb01e90fe7c6126581d662a0b4e43e
+
+  - name: swift-qwen3.8-27b
+    role: candidate
+    # Third-party fine-tune of the primary's base model, trained to emit fewer
+    # reasoning tokens. Held as a candidate while it is evaluated on real
+    # agentic sessions; llama-serve.sh only ever loads role: primary.
+    repo: ukisai/Swift-Qwen3.8-27B-GGUF
+    revision: b12fc8f44af7bdf31a3c3309891acb345d3106a2
+    revision_short: b12fc8f44af7
+    quant: Q8_0
+    upstream_repo: ukisai/Swift-Qwen3.8-27b
+    upstream_revision: 1b30aaaf753fe5c1cb51ada2ea0367a53445359c
+    # Custom terms where the primary is Apache-2.0: free below US$1M annual
+    # revenue, paid license above it. The base model underneath is still
+    # Qwen/Qwen3.8-27B.
+    license: LicenseRef-Swift-Open-License-1.0
+    arch: qwen35
+    files:
+      - name: Swift-Qwen3.8-27B-Q8_0.gguf
+        role: weights
+        bytes: 29116389280
+        sha256: 83cc7e31e095fbf0a12ff8f883f97e6e399192be74244c06c470affcd1b51b70
+      - name: mmproj-Swift-Qwen3.8-27B-F16.gguf
+        role: mmproj
+        bytes: 927606976
+        sha256: daa1116c9422fa390cc8688495da0e91781f92841dfc3b31a378ff252571745a
