@@ -83,6 +83,20 @@ done
 #       up as unexplained truncation. With one slot, concurrent requests queue
 #       instead, which fails loudly and predictably.
 #
+#   --spec-type draft-mtp   speculative decoding off the model's own MTP head.
+#       The Q8_0 weights carry an extra block (blk.64.nextn.*, keyed by
+#       qwen35.nextn_predict_layers), so there is no separate draft model to
+#       download or pin. Measured on a fixed 900-token completion at
+#       temperature 0: 40.9s without, 26.7s with, for 22.0 -> 33.7 t/s. Output
+#       was byte-identical with and without, as speculative decoding should be.
+#
+#   --spec-draft-n-max 3    draft budget per step. This is also llama.cpp's
+#       current default; it is passed explicitly so a future change to that
+#       default does not silently retune this. Larger budgets lengthen the mean
+#       accepted run but lose more to rejection, and are slower overall:
+#       n=3 26.7s (acceptance 0.68), n=4 31.0s (0.60), n=5 31.3s (0.52),
+#       n=6 36.2s (0.47).
+#
 # --cache-reuse is deliberately absent: llama-server disables it when an mmproj
 # is loaded ("cache_reuse is not supported by multimodal"), so passing it only
 # produces a warning. Note the consequence for long sessions: an agent's
@@ -108,6 +122,8 @@ cmd=(
     --cache-type-k f16 --cache-type-v f16
     --image-min-tokens 1024
     --jinja
+    --spec-type draft-mtp
+    --spec-draft-n-max 3
 )
 
 if [ "$DRY_RUN" = true ]; then
