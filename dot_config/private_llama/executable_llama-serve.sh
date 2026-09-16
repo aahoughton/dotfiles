@@ -7,13 +7,20 @@
 # process supervisor if you want it detached.
 #
 # Usage:
-#   llama-serve.sh [-p port] [-c ctx] [-n]
+#   llama-serve.sh [-p port] [-c ctx] [-n] [-- extra llama-server flags...]
 #     -n  print the command that would run, then exit
 #
-# Binding: this listens on 0.0.0.0 by design, so the model is reachable from the
-# LAN and over Tailscale. That is only acceptable because --api-key-file is
-# always passed. If the key file is missing this script refuses to start rather
-# than falling back to an unauthenticated listener.
+# Anything after `--` is appended to the llama-server command verbatim. That is
+# how llama-agent.sh layers tool flags on top without duplicating this file.
+#
+# Binding: this listens on loopback only. Tailnet reachability comes from
+# `tailscale serve`, which proxies http://behemoth:8080 to 127.0.0.1:8080, so
+# tailnet devices get in and the LAN does not. See MAC_README.md for that setup.
+#
+# The API key is still required, as defence in depth rather than as the only
+# control: anything that can reach loopback (any local process, any SSH session)
+# reaches this port. If the key file is missing this script refuses to start
+# rather than falling back to an unauthenticated listener.
 
 set -euo pipefail
 
@@ -31,6 +38,8 @@ while getopts "p:c:n" opt; do
         *) echo "Usage: llama-serve.sh [-p port] [-c ctx] [-n]" >&2; exit 1 ;;
     esac
 done
+shift $((OPTIND - 1))
+EXTRA=("$@")
 
 for cmd in llama-server yq; do
     command -v "$cmd" >/dev/null 2>&1 || { echo "error: $cmd not found on PATH" >&2; exit 1; }
@@ -41,7 +50,7 @@ done
 # Refuse to bind a public interface without a key. See the header note.
 if [ ! -s "$KEY_FILE" ]; then
     echo "error: $KEY_FILE is missing or empty; refusing to start an" >&2
-    echo "       unauthenticated server on 0.0.0.0. Create it with:" >&2
+    echo "       unauthenticated server. Create it with:" >&2
     echo "         mkdir -p ~/.config/llama && chmod 700 ~/.config/llama" >&2
     echo "         openssl rand -hex 32 > $KEY_FILE && chmod 600 $KEY_FILE" >&2
     exit 1
@@ -112,7 +121,7 @@ cmd=(
     --model "$weights"
     --mmproj "$mmproj"
     --alias "$alias_name"
-    --host 0.0.0.0 --port "$PORT"
+    --host 127.0.0.1 --port "$PORT"
     --api-key-file "$KEY_FILE"
     --n-gpu-layers 999
     --ctx-size "$CTX"
@@ -125,6 +134,10 @@ cmd=(
     --spec-type draft-mtp
     --spec-draft-n-max 3
 )
+
+if [ ${#EXTRA[@]} -gt 0 ]; then
+    cmd+=("${EXTRA[@]}")
+fi
 
 if [ "$DRY_RUN" = true ]; then
     printf '%q ' "${cmd[@]}"; echo
