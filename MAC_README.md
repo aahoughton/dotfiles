@@ -47,6 +47,28 @@ After running the bootstrap from [README.md](README.md), the following are handl
      Reinstall it after a `brew upgrade node`, which can clear the global prefix.
      node is a brew formula rather than a mise runtime for this reason; a mise
      version switch would take the global CLIs with it.
+8. **Behemoth only:** Web search for the local model, via `llama-agent.sh`.
+   - Generate the SearXNG secret. Unmanaged for the same reason as the API key:
+     ```
+     printf 'SEARXNG_SECRET=%s\n' "$(openssl rand -hex 32)" \
+       > ~/.config/llama/searxng.env && chmod 600 ~/.config/llama/searxng.env
+     ```
+   - Start SearXNG (OrbStack must be running):
+     ```
+     docker compose -f ~/.config/llama/searxng/compose.yaml up -d
+     ```
+   - Start the server with tools instead of the plain one:
+     `~/.config/llama/llama-agent.sh`
+   - Check it: `curl -s localhost:8889/healthz` should return `OK`, and
+     `curl -s -H "Authorization: Bearer $(cat ~/.config/llama/api-key)"
+     localhost:8080/tools | jq length` should return 4.
+
+   Tools are reachable by anything holding the API key, and `POST /tools` runs
+   them with no model involved. Treat the key as the whole boundary. `-t` adds
+   llama.cpp's file and shell tools inside a throwaway container with nothing
+   mounted; do not add `--tools` to `llama-serve.sh` directly, where they would
+   run against your home directory.
+
 ## Optional Software
 
 Not included in the automated install — evaluate per-machine:
