@@ -33,12 +33,20 @@ After running the bootstrap from [README.md](README.md), the following are handl
    - Restore the weights (~30 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
    - Start the server: `~/.config/llama/llama-serve.sh`
+   - Expose it to the tailnet. The server binds loopback, so without this only
+     this machine can reach it. Persists across reboots:
+     ```
+     tailscale serve --bg --http=8080 http://127.0.0.1:8080
+     ```
+     Then it answers at `http://behemoth:8080` from any tailnet device, and
+     nowhere on the LAN. Use `--https=443` instead once HTTPS certs are enabled
+     for the tailnet; they are not today, and `tailscale serve --https` hangs on
+     cert provisioning rather than reporting why.
    - Install the coding agent. This one is npm, not Homebrew:
      `npm install -g @earendil-works/pi-coding-agent`
      Reinstall it after a `brew upgrade node`, which can clear the global prefix.
      node is a brew formula rather than a mise runtime for this reason; a mise
      version switch would take the global CLIs with it.
-
 ## Optional Software
 
 Not included in the automated install — evaluate per-machine:
