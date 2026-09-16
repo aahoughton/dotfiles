@@ -1,0 +1,25 @@
+# SearXNG for the local agent stack. Start with:
+#   docker compose -f ~/.config/llama/searxng/compose.yaml up -d
+#
+# Port 8889 rather than SearXNG's usual 8888: that one is the atuin sync
+# server on this machine.
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    # Loopback only. llama-server reaches it directly; the MCP container
+    # reaches it via host.docker.internal.
+    ports:
+      - "127.0.0.1:8889:8080"
+    volumes:
+      - ./:/etc/searxng:rw
+    env_file:
+      - ../searxng.env
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8889/
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "2"

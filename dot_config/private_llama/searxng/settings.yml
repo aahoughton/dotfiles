@@ -1,0 +1,22 @@
+# SearXNG configuration for the local agent stack.
+#
+# No secret_key here on purpose. This repo is public, and the image only
+# generates one when settings.yml is absent, so a committed key would be a
+# published constant. SEARXNG_SECRET is supplied from searxng.env instead;
+# see MAC_README.md.
+
+use_default_settings: true
+
+server:
+  # The limiter exists to slow down abusive public instances. This one answers
+  # only on loopback, to one agent, and the limiter rejects the burst of
+  # requests a single research turn produces.
+  limiter: false
+  image_proxy: true
+
+search:
+  # json is what the MCP server consumes; html is kept so the instance stays
+  # usable in a browser when a result needs checking by hand.
+  formats:
+    - html
+    - json

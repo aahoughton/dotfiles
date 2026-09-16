@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "searxng": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "SEARXNG_URL=http://host.docker.internal:8889",
+        "isokoliuk/mcp-searxng:latest"
+      ]
+    }
+  }
+}
