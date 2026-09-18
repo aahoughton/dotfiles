@@ -28,31 +28,41 @@
 # separator, behind a wrapper, past quoted spans. Three rounds of review found
 # a leak each time, ending with a quoted argument that could paint a specific
 # remote host's colour during a plain local `echo`. Matching an unparsed shell
-# string has no clean bottom, so this only recognises the shape actually typed:
+# string has no clean bottom, so this only recognises the shapes actually
+# typed:
 #
 #   ssh <options> <destination>          optionally prefixed by `command`,
-#                                        and the ssh may be a path
+#   mosh <options> <destination>         and the ssh or mosh may be a path
 #
-# Anything else that so much as mentions ssh paints base. That is noisier --
-# `grep ssh /etc/services` flashes base until the next prompt -- but it makes
-# the dangerous outcome structurally unreachable: the only way to get a host's
-# colour is for that host to be the destination of a literal ssh command.
+# Anything else that so much as mentions ssh or mosh paints base. That is
+# noisier -- `grep ssh /etc/services` flashes base until the next prompt -- but
+# it makes the dangerous outcome structurally unreachable: the only way to get
+# a host's colour is for that host to be the destination of a literal ssh or
+# mosh command.
+#
+# The two option grammars are read apart rather than folded together. ssh
+# bundles single-dash flags, so -4p 2222 is three options and an argument;
+# mosh's are Getopt::Long, so --port=2222, --port 2222 and any unique
+# abbreviation of either all mean the same thing, and its -o is a boolean where
+# ssh's takes an argument. One shared table would have to be wrong for one of
+# them.
 #
 # Known limits, all of which land on base rather than a wrong host: a quoted
 # option value containing spaces (`ssh -o 'ProxyCommand nc %h %p' behemoth`)
-# tokenises into pieces and hides the destination; and an ssh behind a wrapper,
-# after a separator, or inside a loop is not recognised at all.
+# tokenises into pieces and hides the destination; `mosh --ssh=...` is refused
+# outright for that same reason; and an ssh or mosh behind a wrapper, after a
+# separator, or inside a loop is not recognised at all.
 
 # --- colour table ---------------------------------------------------------
 # Retuning is a one-line edit. `colorcheck` renders these side by side, and
 # takes extra candidates as arguments.
 
 # Must match the `background` of the Ghostty theme (currently Monokai Pro
-# Octagon). Used for ssh destinations we have no colour for, so that an
+# Octagon). Used for remote destinations we have no colour for, so that an
 # unfamiliar or unreadable host is visibly *not* one of the known machines.
 set -g __ghostty_tint_base '#282a3a'
 
-# This machine, and so also the colour restored when ssh exits.
+# This machine, and so also the colour restored when a remote session exits.
 set -g __ghostty_tint_local '#203044'
 
 function __ghostty_tint_colour -a hex -d 'Print the canonical #rrggbb form of a colour, or nothing'
@@ -79,7 +89,7 @@ function __ghostty_tint_canon -a name -d 'Canonical map key for a host name'
     string replace -ra -- '[^a-z0-9_]' '_' (string lower -- $h)
 end
 
-function __ghostty_tint_add -a alias hex -d 'Register a background tint for an ssh destination'
+function __ghostty_tint_add -a alias hex -d 'Register a background tint for a remote destination'
     if test -z "$alias" -o -z "$hex"
         echo "__ghostty_tint_add: need both a host alias and a #rrggbb colour" >&2
         return 1
@@ -117,7 +127,7 @@ __ghostty_tint_add behemoth '#38341a'
 
 # --- lookup ---------------------------------------------------------------
 
-function __ghostty_tint_lookup -a dest -d 'Print the tint registered for an ssh destination'
+function __ghostty_tint_lookup -a dest -d 'Print the tint registered for a remote destination'
     test -n "$dest"; or return 1
     set -l key (__ghostty_tint_canon $dest)
     test -n "$key"; or return 1
@@ -127,9 +137,13 @@ function __ghostty_tint_lookup -a dest -d 'Print the tint registered for an ssh 
     echo $$var
 end
 
-function __ghostty_tint_for_command -a cmdline -d 'Print the tint an ssh command line calls for'
+function __ghostty_tint_for_command -a cmdline -d 'Print the tint a remote command line calls for'
     # ssh(1) options that consume an argument.
-    set -l takes_arg B b c D E e F I i J L l m O o P p Q R S W w
+    set -l ssh_takes_arg B b c D E e F I i J L l m O o P p Q R S W w
+    # mosh(1) options that consume an argument in their separated form. Every
+    # one is also spelled --opt=value, which carries its own argument and so
+    # consumes no following token.
+    set -l mosh_takes_arg bind-server client experimental-remote-ip family p port predict server
 
     set -l tokens (string split -n ' ' -- $cmdline)
     set -q tokens[1]; or return 1
@@ -137,12 +151,17 @@ function __ghostty_tint_for_command -a cmdline -d 'Print the tint an ssh command
     set -l i 1
     test "$tokens[$i]" = command; and set i (math $i + 1)
 
-    # Matches ssh and /usr/bin/ssh; not myssh, sshpass, ssh_config.
-    if not string match -qr -- '(^|/)ssh$' "$tokens[$i]"
-        # Not a shape we read. If the bare word appears anywhere -- behind a
+    # Matches ssh, mosh and /usr/bin/ssh; not myssh, sshpass, ssh_config.
+    set -l prog
+    if string match -qr -- '(^|/)ssh$' "$tokens[$i]"
+        set prog ssh
+    else if string match -qr -- '(^|/)mosh$' "$tokens[$i]"
+        set prog mosh
+    else
+        # Not a shape we read. If either bare word appears anywhere -- behind a
         # wrapper, after a separator, inside a loop -- say "cannot tell"
         # rather than leaving the tab asserting this machine.
-        if string match -qr -- '(^|[^A-Za-z0-9_])ssh([^A-Za-z0-9_]|$)' -- $cmdline
+        if string match -qr -- '(^|[^A-Za-z0-9_])(ssh|mosh)([^A-Za-z0-9_]|$)' -- $cmdline
             echo $__ghostty_tint_base
             return 0
         end
@@ -152,7 +171,7 @@ function __ghostty_tint_for_command -a cmdline -d 'Print the tint an ssh command
 
     while test $i -le (count $tokens)
         set -l tok $tokens[$i]
-        if string match -q -- '-*' $tok
+        if string match -q -- '-*' $tok; and test $prog = ssh
             # Scan the bundle left to right. The first letter that takes an
             # argument consumes the rest of the token if there is one, and
             # otherwise the following token. So -oFoo=bar and -i~/key consume
@@ -163,8 +182,39 @@ function __ghostty_tint_for_command -a cmdline -d 'Print the tint an ssh command
             set -l n (count $letters)
             if test $n -gt 0
                 for j in (seq $n)
-                    if contains -- $letters[$j] $takes_arg
+                    if contains -- $letters[$j] $ssh_takes_arg
                         test $j -eq $n; and set i (math $i + 1)
+                        break
+                    end
+                end
+            end
+        else if string match -q -- '-*' $tok
+            # mosh --ssh takes an entire ssh command line as one quoted
+            # argument. Split on spaces it is unreadable, and a host name
+            # inside it would be read as the destination -- `mosh
+            # --ssh="ssh -J behemoth" sureify` painting behemoth is the exact
+            # lie this file exists to prevent. Refuse the line instead.
+            if string match -qr -- '^--?ssh(=|$)' $tok
+                echo $__ghostty_tint_base
+                return 0
+            end
+            # No bundling here: one option per token. A name that still carries
+            # its own `=value` is not a prefix of any bare option name, so it
+            # falls out of the loop below consuming nothing and needs no case
+            # of its own; a bare `--` leaves an empty name and likewise
+            # consumes nothing, leaving the token after it to be read as the
+            # destination.
+            set -l name (string replace -r -- '^--?' '' $tok)
+            if test -n "$name"
+                # Prefix rather than equality, because Getopt::Long accepts
+                # abbreviations: `mosh --bind behemoth sureify` has to eat
+                # behemoth, not read it as the destination. An abbreviation
+                # that is ambiguous, or one of the flags that takes nothing,
+                # errs towards consuming a token and so towards base.
+                set -l pat '^'(string escape --style=regex -- $name)
+                for opt in $mosh_takes_arg
+                    if string match -qr -- $pat $opt
+                        set i (math $i + 1)
                         break
                     end
                 end
@@ -184,7 +234,7 @@ function __ghostty_tint_for_command -a cmdline -d 'Print the tint an ssh command
         set i (math $i + 1)
     end
 
-    # An ssh whose destination we could not find.
+    # An ssh or mosh whose destination we could not find.
     echo $__ghostty_tint_base
     return 0
 end
@@ -205,7 +255,7 @@ if status is-interactive
         printf '\e]11;%s\a' $hex
     end
 
-    function __ghostty_tint_preexec --on-event fish_preexec -d 'Tint the tab for an ssh destination'
+    function __ghostty_tint_preexec --on-event fish_preexec -d 'Tint the tab for a remote destination'
         set -l hex (__ghostty_tint_for_command $argv[1])
         test -n "$hex"; and __ghostty_tint_paint $hex
     end
