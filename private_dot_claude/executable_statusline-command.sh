@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Claude Code status line.
 # Receives the session JSON on stdin and prints a single line:
-#   <shortened cwd> · <model> · ctx <pct>% (<tokens used>)
+#   <shortened cwd> · <branch> · <model> · ctx <pct>% (<tokens used>)
 # Managed by chezmoi. Enable via the "statusLine" block in ~/.claude/settings.json.
 
 input=$(cat)
