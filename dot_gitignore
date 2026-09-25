@@ -323,7 +323,6 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
-#!! ERROR: typescript is undefined. Use list command to see defined gitignore types !!#
 
 ### Vim ###
 # Swap
