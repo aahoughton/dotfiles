@@ -1,5 +1,8 @@
 {{ if eq .chezmoi.os "darwin" -}}
 #!/bin/bash
+# Without -e the script's status is the last command's, so a failed brew
+# bundle was recorded as run and not retried until the package list changed.
+set -e
 
 brew bundle --file=/dev/stdin <<EOF
 {{ range .packages.darwin.brews -}}
