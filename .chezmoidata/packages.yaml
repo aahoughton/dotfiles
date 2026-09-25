@@ -1,4 +1,21 @@
 packages:
+  # Global mise tools for every OS, as `mise use -g` specs. Installed by
+  # run_onchange_after_install-mise-tools.sh.tmpl.
+  #
+  # Node CLIs go here, never `npm install -g`: an npm -g package lives in one
+  # Node version's prefix and drops off PATH wherever mise selects another.
+  # `npm:` tools get their own directory but still run on the active Node, so
+  # a project pinned below a tool's `engines` minimum can break it. codex and
+  # pi use mise's registry names, which resolve to native release binaries
+  # and do not need Node at all.
+  mise:
+    - 'node@lts'
+    - 'codex'
+    - 'pi'
+    - 'github:tailscale/aperture-cli'
+    - 'npm:skills'
+    - 'npm:zombie-mermaid'
+
   darwin:
     brews:
       # QUALITY OF LIFE
@@ -28,7 +45,6 @@ packages:
       - 'mise'
       - 'libpq'
       - 'nmap'
-      - 'skills'
       - 'tcpflow'
       - 'watch'
       - 'uv'
@@ -36,11 +52,6 @@ packages:
       - 'yq'
       # LANGUAGES (use mise for most)
       - 'ghc'
-      # node is brew-managed, not mise-managed, on purpose: globally
-      # installed npm CLIs (pi) live in the runtime's prefix, and a
-      # mise version switch would strip them. It was previously present
-      # only as a transitive dependency of skills.
-      - 'node'
     casks:
       - '1password'
       - '1password-cli' #should be covered by the pre-install script, but shrug
