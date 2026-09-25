@@ -1,0 +1,34 @@
+#!/bin/bash
+# Adds packages.mise from .chezmoidata/packages.yaml to the global mise config
+# and installs them. Re-runs whenever that list changes.
+#
+# `mise use -g` sets only the keys it is given, so the config stays
+# machine-owned: tools added by hand on one machine are left alone. It is also
+# additive only. Dropping a tool from the list removes it nowhere; run
+# `mise unuse -g <tool>` on each machine.
+#
+# The after_ prefix runs this once the package scripts have installed mise,
+# which may not be on PATH yet in the shell chezmoi was started from.
+set -euo pipefail
+
+for mise in "$(command -v mise || true)" /opt/homebrew/bin/mise "$HOME/.local/bin/mise"; do
+    [ -x "$mise" ] && break
+done
+if [ ! -x "$mise" ]; then
+    # Fail rather than skip: chezmoi records a script that exits 0 as done and
+    # would not retry it until the list changes.
+    echo "mise not found" >&2
+    exit 1
+fi
+
+# One tool per call: a multi-tool `mise use` writes nothing if any tool fails,
+# and one tool failing (mise refuses npm packages newer than 30 days, for one)
+# should not keep the rest off PATH.
+failed=()
+for tool in{{ range .packages.mise }} {{ . | quote }}{{ end }}; do
+    "$mise" use -g "$tool" || failed+=("$tool")
+done
+if [ ${#failed[@]} -gt 0 ]; then
+    echo "mise could not install: ${failed[*]}" >&2
+    exit 1
+fi

@@ -198,6 +198,12 @@ delete the appended block.
 
 Package lists are in `.chezmoidata/packages.yaml`. The install scripts (`run_onchange_*-install-packages.sh.tmpl`) will re-run when that file changes.
 
+Global tools (Node itself and Node CLIs) are in the `mise:` list in the same
+file, installed by `run_onchange_after_install-mise-tools.sh.tmpl` with
+`mise use -g`. That adds entries to `~/.config/mise/config.toml` without owning
+it, so tools added on one machine stay there. Add Node CLIs to that list rather
+than using `npm install -g`.
+
 If `chezmoi apply` reports a file "has changed since chezmoi last wrote it", something
 edited it outside chezmoi. Check what would be lost before overriding:
 

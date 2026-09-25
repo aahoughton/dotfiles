@@ -4,6 +4,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
 
 - Machine name (prompted during `chezmoi init`)
 - Homebrew packages and casks
+- Global mise tools (Node LTS and CLIs such as pi and codex)
 - Default shell set to fish
 - SSH / Remote Login enabled
 - Dock: autohide, hide recents
@@ -42,11 +43,6 @@ After running the bootstrap from [README.md](README.md), the following are handl
      nowhere on the LAN. Use `--https=443` instead once HTTPS certs are enabled
      for the tailnet; they are not today, and `tailscale serve --https` hangs on
      cert provisioning rather than reporting why.
-   - Install the coding agent. This one is npm, not Homebrew:
-     `npm install -g @earendil-works/pi-coding-agent`
-     Reinstall it after a `brew upgrade node`, which can clear the global prefix.
-     node is a brew formula rather than a mise runtime for this reason; a mise
-     version switch would take the global CLIs with it.
 8. **Behemoth only:** Web search for the local model, via `llama-agent.sh`.
    - Generate the SearXNG secret. Unmanaged for the same reason as the API key:
      ```
