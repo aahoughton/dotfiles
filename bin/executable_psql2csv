@@ -7,6 +7,9 @@
 #   psql2csv [psql-options...] < query.sql
 #
 # The query is the last positional argument, or stdin if piped.
+# A last argument that looks like SQL (has whitespace or starts with
+# SELECT/WITH/...) is always taken as the query, so an idle open stdin is
+# never read.
 # All other arguments are forwarded to psql (e.g. -h, -p, -U, -d).
 #
 # Examples:
@@ -47,15 +50,31 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Query: stdin if piped, otherwise last positional arg.
+# True if the argument looks like SQL rather than a psql argument (e.g. a
+# database name): it contains whitespace or starts with a query keyword.
+looks_like_sql() {
+  local re='^[[:space:]]*(select|with|values|table|\()'
+  [[ "$1" =~ [[:space:]] ]] || [[ "$(tr '[:upper:]' '[:lower:]' <<< "$1")" =~ $re ]]
+}
+
+pop_last_arg() {
+  query=${psql_args[${#psql_args[@]}-1]}
+  unset 'psql_args[${#psql_args[@]}-1]'
+}
+
+# Query: a SQL-looking last argument wins; otherwise stdin if it isn't a
+# terminal; otherwise the last argument. Checking the argument first matters
+# when stdin is an open pipe that never gets data (e.g. under an agent or CI
+# runner) -- reading it would block forever.
 query=""
-if [[ ! -t 0 ]]; then
+if [[ ${#psql_args[@]} -gt 0 ]] && looks_like_sql "${psql_args[${#psql_args[@]}-1]}"; then
+  pop_last_arg
+elif [[ ! -t 0 ]]; then
   query=$(cat)
 fi
 if [[ -z "$query" ]]; then
   if [[ ${#psql_args[@]} -gt 0 ]]; then
-    query=${psql_args[${#psql_args[@]}-1]}
-    unset 'psql_args[${#psql_args[@]}-1]'
+    pop_last_arg
   else
     echo "psql2csv: missing query (pass as last argument or via stdin)" >&2
     exit 1
