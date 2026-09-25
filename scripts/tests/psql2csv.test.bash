@@ -74,4 +74,24 @@ check "missing query is an error" \
   "psql2csv: missing query (pass as last argument or via stdin)" \
   "$(psql2csv --dry-run </dev/null 2>&1)"
 
+# The real (non-dry-run) path, under /bin/bash -- the shebang's interpreter,
+# 3.2 on macOS -- with a stub psql that echoes its arguments and stdin.
+# Bash 3.2 treats an empty array as unbound under set -u, so a query with no
+# other psql arguments used to fail here.
+stub_dir=$(mktemp -d)
+printf '#!/bin/sh\necho "args: $*"; cat\n' >"$stub_dir/psql"
+chmod +x "$stub_dir/psql"
+
+check "query with no other psql arguments, under /bin/bash" \
+  "args: --no-psqlrc --quiet
+COPY (SELECT 6) TO STDOUT WITH (FORMAT csv, HEADER)" \
+  "$(PATH="$stub_dir:$PATH" /bin/bash "$SRC" "SELECT 6" </dev/null 2>&1)"
+
+check "psql arguments forwarded, under /bin/bash" \
+  "args: --no-psqlrc --quiet -h localhost mydb
+COPY (SELECT 7) TO STDOUT WITH (FORMAT csv, HEADER)" \
+  "$(PATH="$stub_dir:$PATH" /bin/bash "$SRC" -h localhost mydb "SELECT 7" </dev/null 2>&1)"
+
+rm -rf "$stub_dir"
+
 [[ $failures -eq 0 ]] && echo "all passed" || { echo "$failures failed"; exit 1; }
