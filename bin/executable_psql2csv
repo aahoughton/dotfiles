@@ -92,5 +92,7 @@ sql="COPY ($query) TO STDOUT WITH ($copy_opts)"
 if [[ "$dry_run" == true ]]; then
   printf '%s\n' "$sql"
 else
-  psql --no-psqlrc --quiet "${psql_args[@]}" <<< "$sql"
+  # The ${a[@]+...} form keeps an empty array from tripping set -u in bash 3.2
+  # (macOS /bin/bash) when the query was the only argument.
+  psql --no-psqlrc --quiet ${psql_args[@]+"${psql_args[@]}"} <<< "$sql"
 fi
