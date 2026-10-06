@@ -1,5 +1,7 @@
 README.md
 MAC_README.md
+AGENTS.md
+CLAUDE.md
 scripts/
 
 {{/* Machine-local, deliberately unmanaged. Listed so an accidental
