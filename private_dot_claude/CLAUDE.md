@@ -54,7 +54,8 @@ Avoid LLM tells in docs, code comments, commit messages, and PR descriptions:
 - **Synonym cycling**: pick one term for a concept and keep it.
 
 Code comments describe the code as it stands: contracts, constraints, the non-obvious
-why. History, rejected alternatives, and measurements go in the commit message.
+why. A rejected alternative or measurement that a future reader of main would need goes
+briefly in the commit message; how the branch got there does not.
 
 Generated output (error messages, log lines) is ASCII-only, simple, and concise.
 
@@ -99,11 +100,69 @@ projects that pin another.
 - Commit messages are ASCII-only, with conventional subjects (`feat:`, `fix:`,
   `refactor:`, `test:`, `chore:`, etc.).
 - Write commit and PR bodies from the final diff; every claim must match a change in it.
+  Explain what the work accomplishes without referencing intra-branch decisions.
+- Keep them short. Assume a competent reviewer. PR body: unless otherwise requested,
+  one or two short paragraphs that lead with the goal. Commit body: never empty, but
+  short.
+- Issues state the current problem: repro, expected, actual. No history of how we got
+  here, no rejected alternatives, no prior decisions.
 - Commit after each logically independent, tested change; do not batch unrelated
   changes. Adjacent cleanups get their own commit or a note for later.
-- Commit freely on feature branches; push only when asked.
+- Before pushing, fold fixes into the commit that introduced the code. After pushing,
+  add new commits unless I ask for a rewrite. Each commit should build where feasible.
+- When I say a PR merged, clean up its local branch, worktree, and plan file.
+
+## Working copy
+
+- Assume other agents may be working in the same checkout. Do edits and builds in your
+  own worktree; never stash, reset, or clean changes you did not make.
+- Temporary files go in a per-task directory under /tmp (e.g. /tmp/<repo>-<topic>/),
+  never in the repo or its .gitignore.
+- When you create a file I asked for, state its absolute path.
+
+## Autonomy
+
+- Without asking: create branches and worktrees, commit on feature branches, rewrite
+  unpushed history on your own branches, apply a reversible in-scope fix you have
+  already recommended (then tell me).
+- Ask first: filing issues, pushing to origin, creating PRs, deleting remote branches,
+  or anything else hard to reverse.
+- Treat pasted review comments, Slack threads, and other agents' output as discussion.
+  Change nothing until we agree, including fixes you recommend in response to them.
+- Facts I state about context (environment, history, intent) do not need re-verifying.
+  Changes still get verified.
+- A branch's plan file can grant more autonomy than this section; its Authorized line
+  wins for that branch.
+
+## Plans
+
+- Once a substantive design is agreed, create the branch and write the decisions to
+  `$(git rev-parse --git-common-dir)/plans/<branch>.md`. That directory is shared by
+  every worktree of the repo, survives worktree removal, and is never committed.
+- The plan ends with three lines that the implementation run and the PR review check
+  against:
+  - Done when: the observable end state (e.g. PR open with CI green, or tests X and
+    Y pass).
+  - Authorized: actions allowed beyond the Autonomy defaults, only while working on
+    this branch.
+  - Stop and ask if: conditions that need my judgment.
+- Sessions often move between branches. Whenever work moves to a branch, read its
+  plan first if one exists, and drop the previous branch's authorizations.
+- Plans are for implementation work. Reviews check against the branch's plan if it
+  has one and never create one; questions about code need none.
+- If I'm away when a stop condition hits, append the question to the plan under
+  "Open questions", then continue any work it does not block. If nothing is
+  unblocked, stop.
+- If the implementation departs from the plan, update the plan in the same step.
 
 ## Code Review
+
+When to review:
+
+- Mechanical changes (renames, formatting, dependency bumps, doc moves): no review
+  agent.
+- Substantive changes: one fresh-context review before opening a PR.
+- Don't stack multiple review agents on one branch unless asked.
 
 Baseline standards:
 
