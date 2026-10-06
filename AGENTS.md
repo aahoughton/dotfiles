@@ -12,5 +12,21 @@ No feature branches. Commit directly to main. Pushing still needs my go-ahead.
   confirm `chezmoi diff <target>` is empty.
 - Files that belong to the repo but not to `~` (docs, this file, scripts) must be listed
   in `.chezmoiignore`, or chezmoi will install them into the home directory.
-- No secrets or host-specific values in committed files; those come from 1Password or
-  init prompts.
+
+## Security
+
+The only personal information allowed in this repo is my name, my email address, and
+minimal detail about my home network (machine hostnames). Secrets and host-specific
+values come from 1Password or init prompts.
+
+Before every commit, review the staged diff and the commit message for anything beyond
+that, including:
+
+- Credentials: keys, tokens, passwords, private key material, auth files.
+- Network detail: IP addresses, MAC addresses, Wi-Fi names, tailnet or internal domain
+  names, ports of services I expose.
+- Account identifiers: cloud account IDs, usernames on other services, phone numbers,
+  street addresses.
+- Employer or client names, and paths or config that reveal them.
+
+If anything turns up, or you're unsure whether it counts, stop and ask before committing.
