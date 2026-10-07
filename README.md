@@ -128,26 +128,26 @@ mode, copy the config, edit `[onepassword] mode`, and use `chezmoi --config`.
 
 ### Over ssh
 
-Applying over ssh lands everything except the vault-backed files above. The cause
-is narrower than "the desktop app is unreachable": the CLI has no standalone
-account of its own (`op account list` is empty, `~/.config/op/config` shows
-`"accounts": null`), so it can only authenticate by delegating to the app. Over
-ssh there is nothing to sign in to.
+Over ssh the CLI can't reach the desktop app. behemoth has a standalone CLI
+account (added with `op account add`), so an ssh session signs in directly and
+then applies as usual:
 
-The default posture is to accept that and run the applies that need keys while
-sitting at the machine. Two escape hatches exist if that becomes annoying:
+```
+eval (op signin)
+chezmoi apply
+```
 
-- `op account add` configures a standalone CLI account, after which
-  `eval $(op signin)` works in an ssh session with `mode = "account"`
-  unchanged. This puts the Secret Key on the box and means typing the master
-  password into an ssh session. Reversible with `op account forget`. Never
-  commit the Secret Key; this repo is public.
-- A service account token works headlessly, but needs the keys moved into
-  `dotfiles` and a config swap, since the modes are exclusive.
+`op signin` asks for the master password and prints a session token as a shell
+command; `eval` puts it in the current shell, and it expires after 30 minutes
+idle. The account puts the Secret Key on the box (in `~/.config/op/config`; never
+commit or print it, this repo is public). `op account forget` removes it.
 
-Every chezmoi command over ssh pays the full `op-ready.sh` timeout, because in
-this configuration the check can never return `ready`. `CHEZMOI_OP_TIMEOUT` and
-`CHEZMOI_OP_NOTICE_AFTER` tune it.
+Without a signed-in session, an ssh apply lands everything except the
+vault-backed files above, and every chezmoi command pays the full `op-ready.sh`
+timeout. `CHEZMOI_OP_TIMEOUT` and `CHEZMOI_OP_NOTICE_AFTER` tune it.
+
+A service account token is the fully headless alternative, but it needs a config
+swap, since the modes are exclusive.
 
 ## Conventions
 
