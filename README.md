@@ -119,7 +119,7 @@ package sets (`packages_<type>`). behemoth is a `desktop` (it has a GUI) that is
 often driven headlessly over ssh, and it stays on `account`.
 
 Service accounts cannot read the built-in Private vault, so anything they need
-must live in a custom vault, currently `Service Credentials`.
+must live in a custom vault: `dotfiles`.
 
 The mode is read from the config file. `CHEZMOI_ONEPASSWORD_MODE` does **not**
 override it; check with `chezmoi dump-config`. To run one apply in a different
@@ -142,7 +142,7 @@ sitting at the machine. Two escape hatches exist if that becomes annoying:
   password into an ssh session. Reversible with `op account forget`. Never
   commit the Secret Key; this repo is public.
 - A service account token works headlessly, but needs the keys moved into
-  `Service Credentials` and a config swap, since the modes are exclusive.
+  `dotfiles` and a config swap, since the modes are exclusive.
 
 Every chezmoi command over ssh pays the full `op-ready.sh` timeout, because in
 this configuration the check can never return `ready`. `CHEZMOI_OP_TIMEOUT` and
