@@ -100,8 +100,9 @@ missing script is a hard error rather than a silent skip.
 
 `.chezmoiignore` then gates the vault-backed files on `scripts/op-ready.sh`,
 which answers "can `op` authenticate right now?" under a 15s bound. On
-`notready` it skips `.ssh/behemoth_ed25519`, `.ssh/github_ed25519`, and
-`.ssh/authorized_keys`, and the apply otherwise succeeds.
+`notready` it skips `.ssh/behemoth_ed25519`, `.ssh/github_ed25519`,
+`.ssh/authorized_keys`, and `.claude/writing-voice.md`, and the apply otherwise
+succeeds.
 
 The desktop **app** is a brew cask, installed later with the rest of the
 packages. So the order is: CLI (hook), every non-secret file, app (cask), sign
@@ -127,7 +128,7 @@ mode, copy the config, edit `[onepassword] mode`, and use `chezmoi --config`.
 
 ### Over ssh
 
-Applying over ssh lands everything except the three key files above. The cause
+Applying over ssh lands everything except the vault-backed files above. The cause
 is narrower than "the desktop app is unreachable": the CLI has no standalone
 account of its own (`op account list` is empty, `~/.config/op/config` shows
 `"accounts": null`), so it can only authenticate by delegating to the app. Over

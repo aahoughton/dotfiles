@@ -59,6 +59,14 @@ briefly in the commit message; how the branch got there does not.
 
 Generated output (error messages, log lines) is ASCII-only, simple, and concise.
 
+### Writing as me
+
+When drafting text I'll send as myself (Slack messages, email, GitHub issues and
+comments on other people's repos, review comments), read `~/.claude/writing-voice.md`
+first. It overrides Prose style for that text. Commit messages, code comments, docs, and
+PRs on my own repos stay under Prose style and Commits and PRs. If the file is missing,
+say so rather than guessing at my voice.
+
 ## Tooling
 
 Use these CLI tools instead of ad-hoc alternatives when available:
