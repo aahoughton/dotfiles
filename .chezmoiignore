@@ -70,6 +70,7 @@ scripts/
 .ssh/behemoth_ed25519
 .ssh/github_ed25519
 .ssh/authorized_keys
+.claude/writing-voice.md
 {{ end }}
 
 {{/* AWS identifiers come from init prompts, not 1Password — they are not
