@@ -24,9 +24,13 @@ fi
 # One tool per call: a multi-tool `mise use` writes nothing if any tool fails,
 # and one tool failing (mise refuses npm packages newer than 30 days, for one)
 # should not keep the rest off PATH.
+#
+# An entry may list several versions of one tool, space-separated; they go to
+# one call so mise keeps them all, the first on PATH.
 failed=()
 for tool in{{ range .packages.mise }} {{ . | quote }}{{ end }}; do
-    "$mise" use -g "$tool" || failed+=("$tool")
+    read -ra specs <<< "$tool"
+    "$mise" use -g "${specs[@]}" || failed+=("$tool")
 done
 if [ ${#failed[@]} -gt 0 ]; then
     echo "mise could not install: ${failed[*]}" >&2
