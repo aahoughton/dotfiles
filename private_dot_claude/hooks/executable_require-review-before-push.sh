@@ -84,10 +84,18 @@ set -uo pipefail
 input=$(cat)
 
 cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2>/dev/null) || exit 0
-case "$cmd" in
-*"git push"*) ;;
-*) exit 0 ;;
-esac
+
+# A push is `git` (or `chezmoi git`) as the command word, optionally after
+# `env VAR=...`, then git's own options (`-C dir`, `-c k=v`, `--`), then
+# `push`. The command word sits at the start of the command or after a `;`,
+# `&`, `|`, `(` or newline. A plain substring match also held commands that
+# only mention a push: a heredoc writing docs about this hook, an echo, a
+# commit message.
+seg_start=$'(^|[;&|(\n])[[:space:]]*'
+prefix='(env[[:space:]]+([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*)?(chezmoi[[:space:]]+)?'
+git_word='git([[:space:]]+(-C|-c)[[:space:]]+[^[:space:]]+|[[:space:]]+-[^[:space:]]*)*'
+push_re="${seg_start}${prefix}${git_word}[[:space:]]+push([[:space:]]|$)"
+[[ $cmd =~ $push_re ]] || exit 0
 
 # The escape hatch has to be readable from the command, not just from the
 # environment. This hook denies the command, so the command never runs,
