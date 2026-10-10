@@ -25,6 +25,7 @@ packages:
       - 'fish'
       - 'fzf'
       - 'helix'
+      - 'herdr'
       - 'htop'
       - 'jump'
       # mdcat renders markdown; symlinked in bin/ as mdless (pager) and
