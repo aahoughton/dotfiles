@@ -12,6 +12,10 @@ plugins=(
   feature-dev@claude-plugins-official
 )
 
+# A fresh install only knows the built-in directory until the first interactive
+# session registers this marketplace. Adding it is a no-op if already present.
+claude plugin marketplace add anthropics/claude-plugins-official
+
 for plugin in "${plugins[@]}"; do
   echo "Installing $plugin..."
   claude plugin install "$plugin"
