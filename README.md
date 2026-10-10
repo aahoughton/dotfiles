@@ -173,10 +173,15 @@ managed one includes:
 | Homebrew casks | `~/.config/chezmoi/skip-casks` (see below) |
 
 `skip-casks` sits next to `chezmoi.toml` and lists casks to leave out of
-`brew bundle` on this machine, one per line, `#` for comments. Editing it re-runs
-the install script on the next apply. It does not uninstall anything; run
-`brew uninstall --cask <name>` for that. A name that is in no cask list fails
-the apply.
+`brew bundle` on this machine, one per line, `#` for comments. Write each name
+exactly as `.chezmoidata` lists it, including the full `owner/tap/name` for a
+tap cask. Changing which casks it lists re-runs the install script on the next
+apply. It does not uninstall anything; run `brew uninstall --cask <name>` for
+that.
+
+A name that is not in this machine's cask lists (shared plus its machine type)
+is an error, and it stops `chezmoi apply`, `status`, and a full `diff` until the
+file is fixed. That includes a cask later removed from `.chezmoidata`.
 
 `.ssh/config.local` is listed in `.chezmoiignore` so `chezmoi add` refuses it.
 Prefer this over editing a managed file directly — that edit will be reverted on
