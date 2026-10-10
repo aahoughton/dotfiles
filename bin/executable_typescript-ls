@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# typescript-ls -- typescript-language-server for editors (ttt, helix).
+#
+# Runs the server on LTS Node whatever the project pins; it needs Node 22+.
+# The server uses the workspace's own TypeScript when it has a tsserver.js.
+# Otherwise (plain JS, loose files, or a TypeScript 7 workspace, which has no
+# tsserver.js) it falls back to the global TypeScript 6 that mise keeps
+# installed next to 7. NODE_PATH is how that fallback is found: the server
+# resolves its "bundled" TypeScript with require.resolve. The server's .bin
+# launcher overwrites NODE_PATH, so this runs its entry point with node.
+#
+# Usage:
+#   typescript-ls --stdio
+set -euo pipefail
+
+ts6=$(mise where npm:typescript@6) || {
+    echo "typescript-ls: TypeScript 6 not installed; run: mise use -g npm:typescript@7 npm:typescript@6" >&2
+    exit 1
+}
+tsls=$(mise where npm:typescript-language-server)
+NODE_PATH="$ts6/node_modules" exec mise exec node@lts -- \
+    node "$tsls/node_modules/typescript-language-server/lib/cli.mjs" "$@"

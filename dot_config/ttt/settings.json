@@ -1,0 +1,22 @@
+{
+  "lsp": {
+    "servers": {
+      "go": {
+        "command": ["gopls"]
+      },
+      "typescript": {
+        "command": ["typescript-ls", "--stdio"],
+        "languages": {
+          ".ts": "typescript",
+          ".mts": "typescript",
+          ".cts": "typescript",
+          ".tsx": "typescriptreact",
+          ".js": "javascript",
+          ".mjs": "javascript",
+          ".cjs": "javascript",
+          ".jsx": "javascriptreact"
+        }
+      }
+    }
+  }
+}
