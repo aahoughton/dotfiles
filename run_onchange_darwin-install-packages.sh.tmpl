@@ -3,21 +3,30 @@
 # Without -e the script's status is the last command's, so a failed brew
 # bundle was recorded as run and not retried until the package list changed.
 set -e
-
-brew bundle --file=/dev/stdin <<EOF
-{{ range .packages.darwin.brews -}}
-brew {{ . | quote }}
-{{ end -}}
-{{ range .packages.darwin.casks -}}
-cask {{ . | quote }}
-{{ end -}}
 {{- $typeKey := printf "packages_%s" .machineType -}}
 {{- $typeData := index . $typeKey | default dict -}}
 {{- $darwin := index $typeData "darwin" | default dict -}}
-{{- range index $darwin "brews" | default list -}}
+{{- $brews := concat .packages.darwin.brews (index $darwin "brews" | default list) -}}
+{{- $casks := concat .packages.darwin.casks (index $darwin "casks" | default list) }}
+
+# brew refuses to load formulae and casks from third-party taps until they are
+# trusted. Listing one by its full tap path (owner/tap/name) is the decision to
+# trust it, so trust exactly those entries, not their whole taps.
+{{ range $brews -}}
+{{ if eq (len (splitList "/" .)) 3 -}}
+brew trust --formula {{ . | quote }}
+{{ end -}}
+{{ end -}}
+{{ range $casks -}}
+{{ if eq (len (splitList "/" .)) 3 -}}
+brew trust --cask {{ . | quote }}
+{{ end -}}
+{{ end }}
+brew bundle --file=/dev/stdin <<EOF
+{{ range $brews -}}
 brew {{ . | quote }}
 {{ end -}}
-{{- range index $darwin "casks" | default list -}}
+{{ range $casks -}}
 cask {{ . | quote }}
 {{ end -}}
 EOF
