@@ -9,8 +9,10 @@ packages:
   # pi use mise's registry names, which resolve to native release binaries
   # and do not need Node at all.
   #
-  # gopls is for ttt. It is a native binary and uses the project's go only to
-  # load packages.
+  # Language servers are for ttt. gopls is a native binary and uses the
+  # project's go only to load packages. typescript-language-server runs
+  # through bin/typescript-ls, which pins it to LTS Node and falls back to
+  # TypeScript 6 (the last release with tsserver.js); `tsc` on PATH is 7.
   mise:
     - 'node@lts'
     - 'go'
@@ -21,6 +23,8 @@ packages:
     - 'npm:skills'
     - 'npm:zombie-mermaid'
     - 'go:golang.org/x/tools/gopls'
+    - 'npm:typescript-language-server'
+    - 'npm:typescript@7 npm:typescript@6'
 
   darwin:
     brews:
