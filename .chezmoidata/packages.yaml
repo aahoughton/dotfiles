@@ -43,6 +43,7 @@ packages:
       - 'fx'
       - 'gh'
       - 'git'
+      - 'git-filter-repo'
       - 'jq'
       - 'kcat'
       - 'mise'
