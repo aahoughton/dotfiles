@@ -7,7 +7,30 @@ set -e
 {{- $typeData := index . $typeKey | default dict -}}
 {{- $darwin := index $typeData "darwin" | default dict -}}
 {{- $brews := concat .packages.darwin.brews (index $darwin "brews" | default list) -}}
-{{- $casks := concat .packages.darwin.casks (index $darwin "casks" | default list) }}
+{{- $allCasks := concat .packages.darwin.casks (index $darwin "casks" | default list) -}}
+{{- /* skip-casks next to chezmoi.toml is local and unmanaged: one cask per
+       line, # starts a comment. Listed casks are left out of brew bundle but
+       not uninstalled. A name that matches no cask fails the apply, so a typo
+       cannot silently skip nothing. */ -}}
+{{- $skipFile := joinPath (osDir .chezmoi.configFile) "skip-casks" -}}
+{{- $skip := list -}}
+{{- if stat $skipFile -}}
+{{-   range splitList "\n" (include $skipFile) -}}
+{{-     $name := regexReplaceAll "#.*" . "" | trim -}}
+{{-     if $name -}}
+{{-       if not (has $name $allCasks) -}}
+{{-         fail (printf "%s: %q is not in any cask list" $skipFile $name) -}}
+{{-       end -}}
+{{-       $skip = append $skip $name -}}
+{{-     end -}}
+{{-   end -}}
+{{- end -}}
+{{- $casks := list -}}
+{{- range $allCasks -}}
+{{-   if not (has . $skip) -}}
+{{-     $casks = append $casks . -}}
+{{-   end -}}
+{{- end }}
 
 # brew refuses to load formulae and casks from third-party taps until they are
 # trusted. Listing one by its full tap path (owner/tap/name) is the decision to

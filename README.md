@@ -170,6 +170,13 @@ managed one includes:
 |---|---|
 | `~/.ssh/config` | `~/.ssh/config.local` (included first, so it can override) |
 | fish config | any `~/.config/fish/conf.d/*.fish` chezmoi doesn't own |
+| Homebrew casks | `~/.config/chezmoi/skip-casks` (see below) |
+
+`skip-casks` sits next to `chezmoi.toml` and lists casks to leave out of
+`brew bundle` on this machine, one per line, `#` for comments. Editing it re-runs
+the install script on the next apply. It does not uninstall anything; run
+`brew uninstall --cask <name>` for that. A name that is in no cask list fails
+the apply.
 
 `.ssh/config.local` is listed in `.chezmoiignore` so `chezmoi add` refuses it.
 Prefer this over editing a managed file directly — that edit will be reverted on
