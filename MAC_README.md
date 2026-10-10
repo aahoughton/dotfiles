@@ -13,7 +13,6 @@ After running the bootstrap from [README.md](README.md), the following are handl
 - Spotlight keyboard shortcuts disabled
 - Battery percentage in menu bar
 - Sound in menu bar
-- Menubar spacing (compact)
 
 ## Manual Steps
 
