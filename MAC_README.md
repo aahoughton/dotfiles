@@ -68,5 +68,5 @@ After running the bootstrap from [README.md](README.md), the following are handl
 
 Not included in the automated install — evaluate per-machine:
 
-- **Transcription:** [superwhisper](https://superwhisper.com) or [Fluid Voice](https://github.com/altic-dev/FluidVoice)
+- **Transcription:** [superwhisper](https://superwhisper.com), if the installed Fluid Voice falls short
 - **Menu bar management:** Barbee (App Store)
