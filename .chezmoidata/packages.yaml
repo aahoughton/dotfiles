@@ -75,6 +75,7 @@ packages:
       - 'fantastical'
       - 'fastmail'
       - 'firefox'
+      - 'fluidvoice'
       - 'ghostty'
       - 'hyperkey'
       - 'jetbrains-toolbox'
