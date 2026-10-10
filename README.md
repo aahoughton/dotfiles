@@ -42,6 +42,13 @@ See [1Password](#1password) for how the modes and the gate work.
 
 ### Post-install
 
+**macOS:** pass 1 installs chezmoi from Homebrew, which owns updates from then
+on. Delete the bootstrap copy, which would otherwise shadow it on `PATH`:
+
+```bash
+rm ~/bin/chezmoi
+```
+
 Update the chezmoi git origin to use `ssh` instead of `https`:
 ```bash
 chezmoi git config remote.origin.url "git@github.com:aahoughton/dotfiles.git"

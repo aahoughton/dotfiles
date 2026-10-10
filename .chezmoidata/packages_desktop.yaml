@@ -4,5 +4,6 @@ packages_desktop:
       # LOCAL LLM
       - 'hf'
       - 'llama.cpp'
+      - 'syslog-ng'
     casks:
       - 'jump-desktop-connect'
