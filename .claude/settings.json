@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/require-review-before-push.sh",
+            "timeout": 10,
+            "statusMessage": "Checking the branch has been reviewed"
+          }
+        ]
+      }
+    ]
+  }
+}

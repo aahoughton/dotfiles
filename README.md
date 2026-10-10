@@ -197,10 +197,11 @@ delete the appended block.
   `~/.claude/agents/`: `diff-reviewer` (reviews a staged diff or sha range from
   fresh context, independent of whoever wrote it).
 - `private_dot_claude/hooks/` — deployed to `~/.claude/hooks/` and wired to
-  nothing. `require-review-before-push.sh` gates `git push` on a recorded review;
-  it is opted into one repo at a time from that repo's own
-  `.claude/settings.local.json`, so the set of gated repos never enters this
-  public tree. The script's header has the JSON and the reasoning.
+  nothing globally. `require-review-before-push.sh` gates `git push` on a
+  recorded review; it is opted into one repo at a time from that repo's own
+  `.claude/settings.local.json`, so the set of gated repos stays out of this
+  public tree. This repo is the exception: it opts in from its committed
+  `.claude/settings.json`. The script's header has the JSON and the reasoning.
 - `personal/`, `src/`, `tmp/` — empty directories created on every machine, kept
   by `.chezmoikeep`.
 - `Desktop/` — symlinks to `$HOME` and `~/tmp` for reachability from file dialogs.
