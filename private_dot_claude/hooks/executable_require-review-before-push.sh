@@ -62,6 +62,10 @@
 # the dotfiles repo this script is managed in, which is public and would
 # otherwise publish exactly that list.
 #
+# The dotfiles repo is the one exception: it opts in through its committed
+# `.claude/settings.json`, which publishes only that the dotfiles repo
+# itself is gated, and keeps the gate on every machine that clones it.
+#
 # The price of that privacy is that the opt-in is per machine as well as
 # per repo: a fresh clone on the other machine is ungated until the file
 # is written there too. Nothing syncs it, deliberately.

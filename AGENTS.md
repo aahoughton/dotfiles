@@ -30,3 +30,8 @@ that, including:
 - Employer or client names, and paths or config that reveal them.
 
 If anything turns up, or you're unsure whether it counts, stop and ask before committing.
+
+Two hooks back this up. A git pre-commit hook runs gitleaks on staged changes for keys
+in known formats. A Claude hook holds `git push` until the outgoing changes are
+reviewed; in this repo that review covers the list above, over both diffs and commit
+messages.
