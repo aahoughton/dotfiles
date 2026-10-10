@@ -15,8 +15,9 @@ sudo systemsetup -setremotelogin on 2>/dev/null || true
 # Use function keys as standard function keys
 defaults write com.apple.HIToolbox AppleFnUsageType -int 0
 
-# Show battery percentage
+# Show battery in menu bar, with percentage
 defaults write com.apple.controlcenter "NSStatusItem VisibleCC Battery" -bool true
+defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
 
 # Show sound in menu bar
 defaults write com.apple.controlcenter "NSStatusItem VisibleCC Sound" -bool true
