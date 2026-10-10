@@ -8,13 +8,19 @@ packages:
   # a project pinned below a tool's `engines` minimum can break it. codex and
   # pi use mise's registry names, which resolve to native release binaries
   # and do not need Node at all.
+  #
+  # gopls is for ttt. It is a native binary and uses the project's go only to
+  # load packages.
   mise:
     - 'node@lts'
+    - 'go'
+    - 'python@3.14'
     - 'codex'
     - 'pi'
     - 'github:tailscale/aperture-cli'
     - 'npm:skills'
     - 'npm:zombie-mermaid'
+    - 'go:golang.org/x/tools/gopls'
 
   darwin:
     brews:
@@ -54,8 +60,6 @@ packages:
       - 'uv'
       - 'xan'
       - 'yq'
-      # LANGUAGES (use mise for most)
-      - 'ghc'
     casks:
       - '1password'
       - '1password-cli' #should be covered by the pre-install script, but shrug
