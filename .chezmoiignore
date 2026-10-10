@@ -2,6 +2,7 @@ README.md
 MAC_README.md
 AGENTS.md
 CLAUDE.md
+mise.toml
 scripts/
 
 {{/* Machine-local, deliberately unmanaged. Listed so an accidental

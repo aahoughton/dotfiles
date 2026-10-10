@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Scans staged changes for credentials in known formats before every commit.
+# gitleaks comes from the repo's mise.toml. Enabled per clone by
+# run_once_after_04-enable-git-hooks.sh.tmpl (core.hooksPath).
+set -euo pipefail
+
+if ! command -v mise >/dev/null; then
+    echo "pre-commit: mise not found; it provides gitleaks for this check" >&2
+    exit 1
+fi
+exec mise exec -- gitleaks git --pre-commit --staged --redact --no-banner -v

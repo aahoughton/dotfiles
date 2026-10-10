@@ -1,0 +1,4 @@
+# Tools for working on this repo, not for the home directory (see
+# .chezmoiignore). Run through `mise exec` by scripts/git-hooks.
+[tools]
+gitleaks = "8.30.1"

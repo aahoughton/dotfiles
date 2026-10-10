@@ -1,0 +1,7 @@
+#!/bin/bash
+# Points this repo's git at the hooks in scripts/git-hooks. Runs after the
+# package scripts, which install git on Linux. The hooks need mise; a
+# tools-only mise.toml does not require trusting.
+set -e
+
+git -C {{ .chezmoi.sourceDir | quote }} config core.hooksPath scripts/git-hooks
