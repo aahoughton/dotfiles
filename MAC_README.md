@@ -13,6 +13,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
 - Spotlight keyboard shortcuts disabled
 - Battery percentage in menu bar
 - Sound in menu bar
+- Desktop only: on AC power, never sleep, restart after a power failure, wake for network access (`pmset`)
 
 ## Manual Steps
 

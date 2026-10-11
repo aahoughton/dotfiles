@@ -1,0 +1,9 @@
+{{ if and (eq .chezmoi.os "darwin") (eq .machineType "desktop") -}}
+#!/bin/bash
+# The desktop hosts the atuin sync server, llama-server and Tailscale SSH, so on
+# AC power it never sleeps, restarts after a power failure, and wakes for
+# network access. pmset settings are not files, so a rebuild loses them.
+set -e
+
+sudo pmset -c sleep 0 autorestart 1 womp 1 displaysleep 10
+{{ end -}}
