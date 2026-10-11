@@ -1,20 +1,20 @@
-{{- /* Every prompt passes an explicit default. Without one promptStringOnce
-       returns the prompt text itself when there is no tty, which would set
-       machineType to a string that is not "server" and so silently select
-       account mode on a headless box. */}}
-{{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop/server)" "" -}}
+{{- /* Every prompt passes an explicit default, which is what
+       `chezmoi init --promptDefaults` writes. An empty machineType selects no
+       machine-specific package set. */}}
+{{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop)" "" -}}
 {{- $machineName := promptStringOnce . "machineName" "Machine name (e.g. aah-mbp)" "" -}}
-{{- /* The trailing "" is the default and is load-bearing: without it,
-       promptStringOnce returns the prompt text itself when there is no tty,
-       so a non-interactive init would write that string into .aws/config. */}}
 {{- $awsAccountId := promptStringOnce . "awsAccountId" "AWS account ID (blank to skip AWS config)" "" -}}
 {{- $awsSsoStartUrl := promptStringOnce . "awsSsoStartUrl" "AWS SSO start URL (blank to skip)" "" -}}
+{{- $onepasswordMode := promptStringOnce . "onepasswordMode" "1Password mode (account = desktop app, service = token)" "account" -}}
 
 [data]
     machineType = {{ $machineType | quote }}
     machineName = {{ $machineName | quote }}
     awsAccountId = {{ $awsAccountId | quote }}
     awsSsoStartUrl = {{ $awsSsoStartUrl | quote }}
+    # Stored here only so promptStringOnce reuses it; [onepassword] mode is
+    # what chezmoi reads.
+    onepasswordMode = {{ $onepasswordMode | quote }}
 
 [onepassword]
 {{- /* How you authenticate to 1Password is a separate question from what kind
@@ -29,7 +29,7 @@
        token is set, and in service mode if it is not. A machine with a GUI
        should stay on account and simply not export the token -- applying it
        over ssh skips the vault-backed files rather than failing. */}}
-    mode = {{ promptStringOnce . "onepasswordMode" "1Password mode (account = desktop app, service = token)" (ternary "service" "account" (eq $machineType "server")) | quote }}
+    mode = {{ $onepasswordMode | quote }}
 [hooks.read-source-state.pre]
     command = ".local/share/chezmoi/.install-password-manager.sh"
 [git]

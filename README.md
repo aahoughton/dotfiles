@@ -28,7 +28,7 @@ the AWS account ID and SSO start URL (leave both blank to skip `.aws/config`).
 # "Integrate with 1Password CLI" to enable Touch ID unlock
 op whoami          # should print your account
 
-# server (headless): a service account token instead
+# headless: a service account token instead
 export OP_SERVICE_ACCOUNT_TOKEN="<TOKEN>"
 
 chezmoi apply
@@ -117,10 +117,10 @@ in, then secrets on the second apply.
 
 ### Modes
 
-`chezmoi init` asks which mode to use, defaulting to `service` for a `server`
-machine type and `account` otherwise. The two are mutually exclusive: chezmoi
-errors in `account` mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, and in `service`
-mode if it isn't. So on an `account` machine, don't export the token.
+`chezmoi init` asks which mode to use, defaulting to `account`. Answer `service`
+on a headless machine. The two are mutually exclusive: chezmoi errors in
+`account` mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, and in `service` mode if it
+isn't. So on an `account` machine, don't export the token.
 
 This is deliberately a separate question from the machine type, which also picks
 package sets (`packages_<type>`). behemoth is a `desktop` (it has a GUI) that is
