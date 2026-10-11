@@ -1,0 +1,7 @@
+onboarding = false
+
+[[keys.command]]
+key = "prefix+t"
+type = "plugin_action"
+command = "local.ttt-focus.open"
+description = "open TTT editor"
