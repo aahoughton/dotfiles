@@ -346,3 +346,6 @@ tags
 
 # End of https://www.toptal.com/developers/gitignore/api/vim,intellij+all,fish,macos,linux,node,typescript,git,java
 
+### Claude Code ###
+# Per-user local settings.
+**/.claude/settings.local.json
