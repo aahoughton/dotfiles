@@ -21,7 +21,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
 3. Go through each installed cask and finalize setup
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
-6. **Behemoth only:** Start OrbStack, then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server. Then `atuin register` / `atuin login` on each machine.
+6. **Behemoth only:** Start OrbStack, then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server, then follow the account steps it prints.
 7. **Behemoth only:** Local LLM. `~/.config/llama/` and `~/.pi/` arrive with the
    first apply; the weights and the API key do not.
    - Recover the server API key. It is deliberately unmanaged, because this repo
