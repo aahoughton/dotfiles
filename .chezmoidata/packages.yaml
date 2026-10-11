@@ -91,7 +91,6 @@ packages:
       - 'pdf-expert'
       - 'rectangle-pro'
       - 'slack'
-      - 'tailscale-app'
       - 'zed'
       - 'zoom'
 

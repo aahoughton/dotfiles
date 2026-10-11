@@ -1,0 +1,6 @@
+packages_laptop:
+  darwin:
+    casks:
+      # GUI Tailscale: it can use exit nodes, which the tailscaled formula on
+      # the desktop cannot.
+      - 'tailscale-app'

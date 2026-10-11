@@ -4,5 +4,9 @@ packages_desktop:
       # LOCAL LLM
       - 'hf'
       - 'llama.cpp'
+      # Open-source tailscaled instead of the GUI app: the only macOS variant
+      # that runs before login and can be a Tailscale SSH server. Never install
+      # both; they fight over the tunnel. Setup is manual, see MAC_README.md.
+      - 'tailscale'
     casks:
       - 'jump-desktop-connect'

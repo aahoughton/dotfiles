@@ -22,7 +22,33 @@ After running the bootstrap from [README.md](README.md), the following are handl
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
 6. **Behemoth only:** Start OrbStack, then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server, then follow the account steps it prints.
-7. **Behemoth only:** Local LLM. `~/.config/llama/` and `~/.pi/` arrive with the
+7. **Behemoth only:** Tailscale. The desktop gets the `tailscale` formula
+   (open-source `tailscaled`) instead of the GUI app, so it can be a Tailscale
+   SSH server and come up before anyone logs in.
+   - If the `tailscale-app` cask is installed, quit it, `brew uninstall --cask
+     tailscale-app`, then `brew link tailscale` (the cask's CLI wrapper blocks
+     the link). Remove the network extension and VPN profile it leaves behind:
+     drag `/Applications/Tailscale.app` to the Trash if a stub remains, and
+     delete the profile in System Settings > VPN.
+   - Start the daemon as a root LaunchDaemon and join the tailnet:
+     ```
+     sudo brew services start tailscale
+     sudo tailscale up --ssh --advertise-exit-node --accept-routes \
+       --operator=$USER --hostname=behemoth
+     ```
+     `--operator` lets `tailscale serve` and `tailscale status` run without
+     sudo. `tailscaled` writes its own `/etc/resolver` files, so MagicDNS works
+     with no extra setup.
+   - In the admin console: approve the exit node, disable key expiry, and make
+     sure the policy's `ssh` rule uses `accept` (not `check`) for
+     `autogroup:nonroot`, or keyless logins from apps will stall on a browser
+     check.
+   - `brew upgrade` does not restart the daemon. Run
+     `sudo brew services restart tailscale` afterwards.
+   - FileVault keeps the disk locked after a cold boot, so `tailscaled` starts
+     only once the disk is unlocked. Use `sudo fdesetup authrestart` for
+     planned reboots.
+8. **Behemoth only:** Local LLM. `~/.config/llama/` and `~/.pi/` arrive with the
    first apply; the weights and the API key do not.
    - Recover the server API key. It is deliberately unmanaged, because this repo
      is public:
@@ -42,7 +68,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
      nowhere on the LAN. Use `--https=443` instead once HTTPS certs are enabled
      for the tailnet; they are not today, and `tailscale serve --https` hangs on
      cert provisioning rather than reporting why.
-8. **Behemoth only:** Web search for the local model, via `llama-agent.sh`.
+9. **Behemoth only:** Web search for the local model, via `llama-agent.sh`.
    - Generate the SearXNG secret. Unmanaged for the same reason as the API key:
      ```
      printf 'SEARXNG_SECRET=%s\n' "$(openssl rand -hex 32)" \
