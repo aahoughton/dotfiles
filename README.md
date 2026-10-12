@@ -218,7 +218,7 @@ delete the appended block.
   public tree. This repo is the exception: it opts in from its committed
   `.claude/settings.json`. The script's header has the JSON and the reasoning.
 - `personal/`, `src/`, `tmp/` — empty directories created on every machine, kept
-  by `.chezmoikeep`.
+  by `.keep`.
 - `Desktop/` — symlinks to `$HOME` and `~/tmp` for reachability from file dialogs.
 
 ## Making changes
