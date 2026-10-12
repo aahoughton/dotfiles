@@ -5,3 +5,15 @@ key = "prefix+t"
 type = "plugin_action"
 command = "local.ttt-focus.open"
 description = "open TTT editor"
+
+[[keys.command]]
+key = "prefix+m"
+type = "plugin_action"
+command = "local.mem-peek.peek"
+description = "peek workspace memory"
+
+[ui.sidebar.spaces]
+rows = [
+  ["state_icon", "workspace", "$mem"],
+  ["branch", "git_status"],
+]
