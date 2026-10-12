@@ -26,22 +26,7 @@ pass 2 on (pass 1 runs before the machine has its name).
 3. Go through each installed cask and finalize setup
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
-6. **Server only:** Start OrbStack and turn on start at login
-   (`orb config set app.start_at_login true`; it defaults to off, and the
-   containers only come back when OrbStack does). Then run
-   `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin
-   sync server, and follow the account steps it prints.
-   - The server's data lives only in OrbStack's `atuin-db` volume, so after a
-     wipe it starts with no accounts. Every client already has the right
-     encryption key (chezmoi installs it from 1Password item `atuin-key`), so
-     register once and the other machines' history uploads unchanged.
-   - Then, on each other machine: `atuin logout`, `atuin login -u <username>`,
-     `atuin sync`. Their old session points at an account that no longer
-     exists.
-   - Any machine: history recorded before pass 2 was encrypted with a key atuin
-     generated itself, which pass 2 replaces, so those records can no longer be
-     decrypted. `atuin store purge` deletes them.
-7. **Desktop only:** Tailscale. The desktop gets the `tailscale` formula
+6. **Desktop only:** Tailscale. The desktop gets the `tailscale` formula
    (open-source `tailscaled`) instead of the GUI app, so it can be a Tailscale
    SSH server and come up before anyone logs in.
    - If the `tailscale-app` cask is installed, quit it, `brew uninstall --cask
@@ -67,6 +52,21 @@ pass 2 on (pass 1 runs before the machine has its name).
    - FileVault keeps the disk locked after a cold boot, so `tailscaled` starts
      only once the disk is unlocked. Use `sudo fdesetup authrestart` for
      planned reboots.
+7. **Server only:** Start OrbStack and turn on start at login
+   (`orb config set app.start_at_login true`; it defaults to off, and the
+   containers only come back when OrbStack does). Then run
+   `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin
+   sync server, and follow the account steps it prints.
+   - The server's data lives only in OrbStack's `atuin-db` volume, so after a
+     wipe it starts with no accounts. Every client already has the right
+     encryption key (chezmoi installs it from 1Password item `atuin-key`), so
+     register once and the other machines' history uploads unchanged.
+   - Then, on each other machine: `atuin logout`, `atuin login -u <username>`,
+     `atuin sync`. Their old session points at an account that no longer
+     exists.
+   - Any machine: history recorded before pass 2 was encrypted with a key atuin
+     generated itself, which pass 2 replaces, so those records can no longer be
+     decrypted. `atuin store purge` deletes them.
 8. **Server only:** Local LLM. `~/.config/llama/`, `~/.pi/`, the API key (from
    1Password item `llama-api-key`) and the `local.llama-agent` LaunchAgent
    arrive with pass 2. The weights do not.
@@ -120,7 +120,7 @@ then:
    on every machine. Clients now point atuin and ssh at the new name. On the
    new server, apply lands the server-only files; on the old one they stay
    until removed by hand.
-2. Run steps 6, 8 and 9 on the new server. Before registering atuin, move the
+2. Run steps 7, 8 and 9 on the new server. Before registering atuin, move the
    old server's data instead: `pg_dump` from the old `atuin-db` container and
    `pg_restore` into the new one.
 3. Retire the old server's `tailscale serve` and LaunchAgent.

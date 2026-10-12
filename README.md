@@ -2,6 +2,19 @@
 
 Machine setup using [chezmoi](https://www.chezmoi.io/). These are personal notes 'cause I forget things.
 
+## Start here
+
+A new machine, in order:
+
+1. [Fresh machine setup](#fresh-machine-setup), then
+   [Post-install](#post-install), on every OS.
+2. **macOS:** [MAC_README.md](MAC_README.md), which lists the manual steps for
+   every Mac, then the desktop-only and server-only ones.
+   **Linux:** no further notes; the packages come from
+   `run_onchange_linux-install-packages.sh.tmpl`.
+
+The rest of this file explains how the bootstrap works and how to change it.
+
 ## Fresh machine setup
 
 Prerequisites:
