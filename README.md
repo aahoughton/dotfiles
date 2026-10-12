@@ -22,7 +22,7 @@ Prerequisites:
 - **macOS:** Install [Homebrew](https://brew.sh/)
 - **Linux:** `sudo apt-get update && sudo apt-get install -y curl sudo zip unzip`
 
-No SSH key or 1Password token is needed up front — the first pass clones over
+No SSH key or 1Password sign-in is needed up front: the first pass clones over
 https and skips anything it can't decrypt yet.
 
 **Pass 1 — everything that isn't a secret:**
@@ -31,22 +31,18 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aahoughton/dotfiles
 ```
 
 This installs packages (including 1Password) and deploys every config that
-doesn't depend on the vault. It will ask for a machine type, a machine name, and
-the 1Password mode. Answers are stored, and a plain `chezmoi init` never asks
-again. To change one later, run `chezmoi init --prompt`, which repeats every
-question, or edit `~/.config/chezmoi/chezmoi.toml`.
+doesn't depend on the vault. It will ask for a machine type and a machine name.
+Answers are stored, and a plain `chezmoi init` never asks again. To change one
+later, run `chezmoi init --prompt`, which repeats every question, or edit
+`~/.config/chezmoi/chezmoi.toml`.
 
 **Pass 2 — the secrets.** Sign in to 1Password, then:
 
 ```bash
-# laptop/desktop: open the 1Password app, then Settings > Developer >
+# open the 1Password app, then Settings > Developer >
 # "Integrate with 1Password CLI" to enable Touch ID unlock
 op signin          # approve in the app; each new shell needs this once
 op whoami          # should print your account
-
-# headless: a service account token instead
-export OP_SERVICE_ACCOUNT_TOKEN="<TOKEN>"
-
 chezmoi apply
 ```
 
@@ -57,7 +53,7 @@ is the server. `.chezmoiignore` checks
 whether `op` can authenticate on every apply, so nothing needs re-running beyond
 `chezmoi apply` itself.
 
-See [1Password](#1password) for how the modes and the gate work.
+See [1Password](#1password) for how the gate works.
 
 ### Post-install
 
@@ -88,8 +84,8 @@ IntelliJ note: turn off shell integration in terminal settings.
 
 ### Existing machines
 
-The AWS account ID and SSO start URL used to be init prompts; they now come
-from 1Password. A machine initialised before that still has them in
+The AWS account ID, SSO start URL and 1Password mode used to be init prompts.
+A machine initialised before that still has them in
 `~/.config/chezmoi/chezmoi.toml`. Run `chezmoi init` once to drop them.
 
 History was rewritten on 2026-08-03 to redact AWS identifiers, so every commit
@@ -124,23 +120,18 @@ The desktop **app** is a brew cask, installed later with the rest of the
 packages. So the order is: CLI (hook), every non-secret file, app (cask), sign
 in, then secrets on the second apply.
 
-### Modes
+### Sessions
 
-`chezmoi init` asks which mode to use, defaulting to `account`. Answer `service`
-on a headless machine. The two are mutually exclusive: chezmoi errors in
-`account` mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, and in `service` mode if it
-isn't. So on an `account` machine, don't export the token.
+chezmoi reads the vault with whatever `op` session the shell has
+(`[onepassword] mode = "account"`): the desktop app's CLI integration, or a
+standalone CLI account signed in with `eval (op signin)` (see "Over ssh"). The
+gate only asks `op whoami`, so a machine without the app, such as a headless
+Linux box, gets the vault-backed files once that account is added and signed
+in. With no session it gets every non-secret file and none of the vault ones.
+Everything chezmoi reads lives in the `dotfiles` vault.
 
-This is deliberately a separate question from the machine type, which also picks
-package sets (`packages_<type>`). behemoth is a `desktop` (it has a GUI) that is
-often driven headlessly over ssh, and it stays on `account`.
-
-Service accounts cannot read the built-in Private vault, so anything they need
-must live in a custom vault: `dotfiles`.
-
-The mode is read from the config file. `CHEZMOI_ONEPASSWORD_MODE` does **not**
-override it; check with `chezmoi dump-config`. To run one apply in a different
-mode, copy the config, edit `[onepassword] mode`, and use `chezmoi --config`.
+chezmoi refuses to run in this mode if `OP_SERVICE_ACCOUNT_TOKEN` is set, so
+don't export one.
 
 ### Over ssh
 
@@ -174,9 +165,6 @@ Without a signed-in session, an ssh apply lands everything except the
 vault-backed files above. With the variable set, `op-ready.sh` gets its answer
 in a few seconds; without it, every chezmoi command waits out the full
 timeout. `CHEZMOI_OP_TIMEOUT` and `CHEZMOI_OP_NOTICE_AFTER` tune it.
-
-A service account token is the fully headless alternative, but it needs a config
-swap, since the modes are exclusive.
 
 ## Conventions
 
