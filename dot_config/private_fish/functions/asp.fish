@@ -53,7 +53,7 @@ function asp --description 'Set AWS Profile and login via SSO'
         return 1
     end
 
-    if not aws configure list-profiles | string match -qr "^$profile\$"
+    if not contains -- $profile (aws configure list-profiles)
         echo "Error: Profile '$profile' not found in ~/.aws/config" >&2
         return 1
     end
