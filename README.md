@@ -20,6 +20,9 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aahoughton/dotfiles
 This installs packages (including 1Password) and deploys every config that
 doesn't depend on the vault. It will ask for a machine type, a machine name, and
 the AWS account ID and SSO start URL (leave both blank to skip `.aws/config`).
+Answers are stored, blanks included, and a plain `chezmoi init` never asks
+again. To change one later, run `chezmoi init --prompt`, which repeats every
+question, or edit `~/.config/chezmoi/chezmoi.toml`.
 
 **Pass 2 — the secrets.** Sign in to 1Password, then:
 
@@ -74,7 +77,7 @@ are read once and cached in `~/.config/chezmoi/chezmoi.toml`. A machine set up
 before that change won't have them, and will skip `.aws/config` until re-prompted:
 
 ```bash
-chezmoi init          # re-prompts for the new values, keeps existing answers
+chezmoi init          # prompts for missing values only, keeps existing answers
 chezmoi diff          # check nothing local gets reverted
 chezmoi apply
 ```
