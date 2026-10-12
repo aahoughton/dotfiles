@@ -23,6 +23,14 @@ After running the bootstrap from [README.md](README.md), the following are handl
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
 6. **Behemoth only:** Start OrbStack, then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server, then follow the account steps it prints.
+   - The server's data lives only in OrbStack's `atuin-db` volume, so after a
+     wipe it starts with no accounts. The other machines still hold the old
+     encryption key, and behemoth's client has generated a new one. Before
+     registering, copy the key from another machine (`atuin key` there) and
+     run `atuin store rekey '<key>'` on behemoth.
+   - Then, on each other machine: `atuin logout`, `atuin login -u <username>`,
+     `atuin sync`. Their old session points at an account that no longer
+     exists.
 7. **Behemoth only:** Tailscale. The desktop gets the `tailscale` formula
    (open-source `tailscaled`) instead of the GUI app, so it can be a Tailscale
    SSH server and come up before anyone logs in.
