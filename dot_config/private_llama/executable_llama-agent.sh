@@ -42,6 +42,9 @@ done
 
 [ -x "$SERVE" ] || { echo "error: $SERVE not found or not executable" >&2; exit 1; }
 [ -f "$MCP_CONFIG" ] || { echo "error: missing $MCP_CONFIG" >&2; exit 1; }
+# mcp-servers.json runs the search server under docker. If llama-server cannot
+# spawn it, it logs a warning and serves with no tools at all.
+command -v docker >/dev/null 2>&1 || { echo "error: docker not on PATH, needed by $MCP_CONFIG" >&2; exit 1; }
 
 # Fail here rather than letting the model discover mid-session that every search
 # returns an error. llama-server starts fine without SearXNG; the tools just
