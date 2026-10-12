@@ -1,4 +1,4 @@
-{{ if and (eq .chezmoi.os "darwin") (eq .machineType "desktop") -}}
+{{ if and (eq .chezmoi.os "darwin") (eq .chezmoi.hostname .server) -}}
 #!/bin/bash
 # Loads the llama-agent LaunchAgent, and reloads it when the plist or any file
 # the server reads at startup changes, so apply leaves the running server

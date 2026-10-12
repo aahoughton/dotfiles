@@ -37,7 +37,10 @@ export OP_SERVICE_ACCOUNT_TOKEN="<TOKEN>"
 chezmoi apply
 ```
 
-SSH keys and `authorized_keys` land on this second pass. `.chezmoiignore` checks
+The vault-backed files (SSH keys and the rest) land on this second pass. On
+the server, so do the server-only files: chezmoi decides what to install
+before pass 1 gives the machine its name, so pass 1 does not know yet that it
+is the server. `.chezmoiignore` checks
 whether `op` can authenticate on every apply, so nothing needs re-running beyond
 `chezmoi apply` itself.
 

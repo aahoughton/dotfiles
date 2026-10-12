@@ -13,17 +13,15 @@ scripts/
 .pi/agent/models-store.json
 .pi/agent/sessions
 
-{{ if ne .chezmoi.hostname "behemoth" }}
+{{/* Server-only pieces; `server` is set in .chezmoidata/server.yaml. The LLM
+     stack runs on the server only: .pi's provider is a llama-server on
+     127.0.0.1. */}}
+{{ if ne .chezmoi.hostname .server }}
 .config/atuin/docker-compose.yaml
-{{ end }}
-
-{{/* Local LLM runtime and agent config. Scoped by machine type: a laptop
-     has neither the memory nor the weights to serve these models, and .pi's
-     provider points at a llama-server that only exists on the desktop. */}}
-{{ if ne .machineType "desktop" }}
 .config/llama
 .pi
 Library/LaunchAgents/local.llama-agent.plist
+.ssh/authorized_keys
 {{ end }}
 
 {{/*
@@ -54,7 +52,7 @@ Library/LaunchAgents/local.llama-agent.plist
 {{-   $opReady = eq (output "sh" (joinPath .chezmoi.sourceDir "scripts/op-ready.sh") | trim) "ready" -}}
 {{- end -}}
 {{ if not $opReady }}
-.ssh/behemoth_ed25519
+.ssh/server_ed25519
 .ssh/github_ed25519
 .ssh/authorized_keys
 .claude/writing-voice.md

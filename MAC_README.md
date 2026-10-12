@@ -17,12 +17,16 @@ After running the bootstrap from [README.md](README.md), the following are handl
 
 ## Manual Steps
 
+"Server" means the machine named in `.chezmoidata/server.yaml` (behemoth
+today); chezmoi installs the server-only files there and nowhere else, from
+pass 2 on (pass 1 runs before the machine has its name).
+
 1. Disable Apple's built-in password manager: System Settings > Passwords > Password Options > uncheck "Autofill Passwords and Passkeys"
 2. Use Quad9 DNS (System Settings > Network > Wi-Fi > <SSID> > Details)
 3. Go through each installed cask and finalize setup
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
-6. **Behemoth only:** Start OrbStack and turn on start at login
+6. **Server only:** Start OrbStack and turn on start at login
    (`orb config set app.start_at_login true`; it defaults to off, and the
    containers only come back when OrbStack does). Then run
    `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin
@@ -37,7 +41,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
    - Any machine: history recorded before pass 2 was encrypted with a key atuin
      generated itself, which pass 2 replaces, so those records can no longer be
      decrypted. `atuin store purge` deletes them.
-7. **Behemoth only:** Tailscale. The desktop gets the `tailscale` formula
+7. **Desktop only:** Tailscale. The desktop gets the `tailscale` formula
    (open-source `tailscaled`) instead of the GUI app, so it can be a Tailscale
    SSH server and come up before anyone logs in.
    - If the `tailscale-app` cask is installed, quit it, `brew uninstall --cask
@@ -49,7 +53,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
      ```
      sudo brew services start tailscale
      sudo tailscale up --ssh --advertise-exit-node --accept-routes \
-       --operator=$USER --hostname=behemoth
+       --operator=$USER --hostname=<machine name>
      ```
      `--operator` lets `tailscale serve` and `tailscale status` run without
      sudo. `tailscaled` writes its own `/etc/resolver` files, so MagicDNS works
@@ -63,10 +67,9 @@ After running the bootstrap from [README.md](README.md), the following are handl
    - FileVault keeps the disk locked after a cold boot, so `tailscaled` starts
      only once the disk is unlocked. Use `sudo fdesetup authrestart` for
      planned reboots.
-8. **Behemoth only:** Local LLM. `~/.config/llama/` and `~/.pi/` arrive with the
-   first apply. The API key (from 1Password item `llama-api-key`) and the
-   `local.llama-agent` LaunchAgent arrive with the first apply after 1Password
-   sign-in. The weights do not.
+8. **Server only:** Local LLM. `~/.config/llama/`, `~/.pi/`, the API key (from
+   1Password item `llama-api-key`) and the `local.llama-agent` LaunchAgent
+   arrive with pass 2. The weights do not.
    - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
    - The LaunchAgent runs `llama-agent.sh` (the server plus the step 9 tools)
@@ -87,7 +90,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
      nowhere on the LAN. Use `--https=443` instead once HTTPS certs are enabled
      for the tailnet; they are not today, and `tailscale serve --https` hangs on
      cert provisioning rather than reporting why.
-9. **Behemoth only:** Web search for the local model, via `llama-agent.sh`.
+9. **Server only:** Web search for the local model, via `llama-agent.sh`.
    - Generate the SearXNG secret. Unmanaged for the same reason as the API key:
      ```
      printf 'SEARXNG_SECRET=%s\n' "$(openssl rand -hex 32)" \
@@ -107,6 +110,26 @@ After running the bootstrap from [README.md](README.md), the following are handl
    llama.cpp's file and shell tools inside a throwaway container with nothing
    mounted; do not add `--tools` to `llama-serve.sh` directly, where they would
    run against your home directory.
+
+## Moving the server
+
+To make another desktop the server, set it up as an ordinary desktop first,
+then:
+
+1. Change `server` in `.chezmoidata/server.yaml`, commit, and `chezmoi update`
+   on every machine. Clients now point atuin and ssh at the new name. On the
+   new server, apply lands the server-only files; on the old one they stay
+   until removed by hand.
+2. Run steps 6, 8 and 9 on the new server. Before registering atuin, move the
+   old server's data instead: `pg_dump` from the old `atuin-db` container and
+   `pg_restore` into the new one.
+3. Retire the old server's `tailscale serve` and LaunchAgent.
+
+Alternatively, retire the old machine first and give the new one the old name
+(set up with the same machine name). `server.yaml` then does not change, and
+step 1 is just `chezmoi update`. Each client's `~/.ssh/known_hosts` still holds
+the old machine's host key under that name (`HostKeyAlias`); remove it with
+`ssh-keygen -R <name>`.
 
 ## Optional Software
 

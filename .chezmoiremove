@@ -1,0 +1,9 @@
+{{/* Targets chezmoi deletes on apply. Renamed files only; each entry can go
+     once every machine has applied past the rename.
+
+     The old server key goes only once its replacement exists, so an apply
+     without 1Password (which skips server_ed25519) cannot leave a machine
+     with neither. */}}
+{{ if stat (joinPath .chezmoi.homeDir ".ssh/server_ed25519") -}}
+.ssh/behemoth_ed25519
+{{ end -}}

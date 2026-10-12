@@ -21,8 +21,8 @@ Host github.com
     # fresh machine needs no prompt. ssh still writes new keys to known_hosts.
     UserKnownHostsFile ~/.ssh/known_hosts ~/.ssh/known_hosts.d/github
 
-{{- if ne .chezmoi.hostname "behemoth" }}
-# --- Behemoth (personal) ---
+{{- if ne .chezmoi.hostname .server }}
+# --- The server (.chezmoidata/server.yaml) ---
 # One name from anywhere. On the home LAN, resolve via mDNS and skip the
 # WireGuard tunnel: Tailscale does route over the LAN when both peers are on
 # it, but userspace WireGuard plus the 1280 MTU still costs ~30-50% of bulk
@@ -30,13 +30,17 @@ Host github.com
 # Off the home LAN, HostName defaults to the bare name, which MagicDNS
 # resolves via the tailnet search domain.
 
-Match host behemoth localnetwork 192.168.86.0/24
-    HostName behemoth.local
+Match host {{ .server }} localnetwork 192.168.86.0/24
+    HostName {{ .server }}.local
 
-Host behemoth
+Host {{ .server }}
     User aah
+    IdentityFile ~/.ssh/server_ed25519
+    # Fallback until server_ed25519 lands: an apply without 1Password skips it,
+    # and .chezmoiremove keeps this one until then. ssh skips a missing file.
+    # Drop with the .chezmoiremove entry.
     IdentityFile ~/.ssh/behemoth_ed25519
-    HostKeyAlias behemoth
+    HostKeyAlias {{ .server }}
 {{ end }}
 # --- Defaults for all hosts ---
 # Must come last: ssh_config uses first-match-wins per parameter, so this

@@ -1,5 +1,5 @@
-## Sync — points at atuin server running on behemoth
-sync_address = "http://behemoth:8888"
+## Sync: the atuin server runs on the server (.chezmoidata/server.yaml)
+sync_address = "http://{{ .server }}:8888"
 sync_frequency = "5m"
 
 ## Prefer directory-local results, then fall back to global

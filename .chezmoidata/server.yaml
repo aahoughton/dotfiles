@@ -1,0 +1,5 @@
+# The machine that runs the shared services: the atuin sync server, the local
+# LLM (llama-server, SearXNG, the LaunchAgent, .pi), and inbound ssh
+# (authorized_keys). Every other machine reaches it by this name. To move the
+# server, see "Moving the server" in MAC_README.md.
+server: behemoth
