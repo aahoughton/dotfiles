@@ -131,22 +131,35 @@ mode, copy the config, edit `[onepassword] mode`, and use `chezmoi --config`.
 
 ### Over ssh
 
-Over ssh the CLI can't reach the desktop app. behemoth has a standalone CLI
-account (added with `op account add`), so an ssh session signs in directly and
-then applies as usual:
+With the app integration on, `op` in an ssh session still goes through the
+desktop app, so its approval prompt appears on that machine's screen rather
+than in your terminal. In ssh sessions fish sets
+`OP_BIOMETRIC_UNLOCK_ENABLED=false` (`conf.d/op_ssh.fish`), which makes `op`
+use a standalone CLI account and ask for the master password instead:
 
 ```
 eval (op signin)
 chezmoi apply
 ```
 
-`op signin` asks for the master password and prints a session token as a shell
-command; `eval` puts it in the current shell, and it expires after 30 minutes
-idle. The account puts the Secret Key on the box (in `~/.config/op/config`; never
-commit or print it, this repo is public). `op account forget` removes it.
+`op signin` prints a session token as a shell command; `eval` puts it in the
+current shell, and it expires after 30 minutes idle.
+
+Each machine you ssh into needs the standalone account once. While the app
+integration is on, `op account add` refuses unless that variable is set, so
+run it from an ssh session or prefix it:
+
+```
+OP_BIOMETRIC_UNLOCK_ENABLED=false op account add --address <account>.1password.com --email <email>
+```
+
+It asks for the Secret Key and the master password, and stores the Secret Key
+on the box (in `~/.config/op/config`; never commit or print it, this repo is
+public). `op account forget` removes it.
 
 Without a signed-in session, an ssh apply lands everything except the
-vault-backed files above, and every chezmoi command pays the full `op-ready.sh`
+vault-backed files above. With the variable set, `op-ready.sh` gets its answer
+in a few seconds; without it, every chezmoi command waits out the full
 timeout. `CHEZMOI_OP_TIMEOUT` and `CHEZMOI_OP_NOTICE_AFTER` tune it.
 
 A service account token is the fully headless alternative, but it needs a config
