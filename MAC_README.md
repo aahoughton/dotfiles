@@ -64,7 +64,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
    - Recover the server API key. It is deliberately unmanaged, because this repo
      is public:
      ```
-     op read "op://dotfiles/behemoth_llama-server/credential" \
+     op read "op://dotfiles/llama-api-key/credential" \
        > ~/.config/llama/api-key && chmod 600 ~/.config/llama/api-key
      ```
    - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
