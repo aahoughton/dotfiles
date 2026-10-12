@@ -17,6 +17,9 @@ Host github.com
     HostName github.com
     User git
     IdentityFile ~/.ssh/github_ed25519
+    # GitHub's published keys ship with chezmoi, so the first connection on a
+    # fresh machine needs no prompt. ssh still writes new keys to known_hosts.
+    UserKnownHostsFile ~/.ssh/known_hosts ~/.ssh/known_hosts.d/github
 
 {{- if ne .chezmoi.hostname "behemoth" }}
 # --- Behemoth (personal) ---
