@@ -74,6 +74,7 @@ Library/LaunchAgents/local.llama-agent.plist
 .claude/writing-voice.md
 .aws/config
 .config/llama/api-key
+.local/share/atuin/key
 {{- /* launchd loads every plist in LaunchAgents at login, so the plist waits
        here with the API key; otherwise a login before the key exists starts
        a server that fails every 30s. */}}

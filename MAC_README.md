@@ -24,15 +24,19 @@ After running the bootstrap from [README.md](README.md), the following are handl
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
 6. **Behemoth only:** Start OrbStack and turn on start at login
    (`orb config set app.start_at_login true`; it defaults to off, and the
-   containers only come back when OrbStack does). Then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server, then follow the account steps it prints.
+   containers only come back when OrbStack does). Then run
+   `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin
+   sync server, and follow the account steps it prints.
    - The server's data lives only in OrbStack's `atuin-db` volume, so after a
-     wipe it starts with no accounts. The other machines still hold the old
-     encryption key, and behemoth's client has generated a new one. Before
-     registering, copy the key from another machine (`atuin key` there) and
-     run `atuin store rekey '<key>'` on behemoth.
+     wipe it starts with no accounts. Every client already has the right
+     encryption key (chezmoi installs it from 1Password item `atuin-key`), so
+     register once and the other machines' history uploads unchanged.
    - Then, on each other machine: `atuin logout`, `atuin login -u <username>`,
      `atuin sync`. Their old session points at an account that no longer
      exists.
+   - Any machine: history recorded before pass 2 was encrypted with a key atuin
+     generated itself, which pass 2 replaces, so those records can no longer be
+     decrypted. `atuin store purge` deletes them.
 7. **Behemoth only:** Tailscale. The desktop gets the `tailscale` formula
    (open-source `tailscaled`) instead of the GUI app, so it can be a Tailscale
    SSH server and come up before anyone logs in.
