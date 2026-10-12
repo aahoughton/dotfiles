@@ -68,7 +68,7 @@ function asp --description 'Set AWS Profile and login via SSO'
         return 0
     end
 
-    # Non-SSO profile: no session to log into — just verify static credentials
+    # Non-SSO profile: no session to log into; just verify static credentials
     if not __asp_is_sso_profile $profile
         if aws sts get-caller-identity &>/dev/null
             echo "AWS_PROFILE set to $profile (credentials valid)"

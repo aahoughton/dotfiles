@@ -33,7 +33,7 @@ Library/LaunchAgents/local.llama-agent.plist
   non-secret config; sign in, re-run `chezmoi apply`, and these files appear.
 
   This is evaluated on every apply rather than stored in chezmoi's config data,
-  which is read once at init — so picking up the secrets needs no re-init.
+  which is read once at init, so picking up the secrets needs no re-init.
 
   The check lives in `scripts/op-ready.sh` because it needs a bound and a
   progress notice, and neither fits in a one-liner; the script's header says

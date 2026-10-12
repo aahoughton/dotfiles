@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# gitsync — sync all git repos under a directory.
+# gitsync -- sync all git repos under a directory.
 #
 # For each repo: checks out default branch, pulls, prunes remote branches,
 # deletes local branches that are both merged and gone from remote, and warns

@@ -1,6 +1,6 @@
 #!/bin/sh
-# Claude Code rewrites ~/.claude/settings.json at runtime — toggling plugins,
-# changing theme/model via /config — so chezmoi cannot own the whole file
+# Claude Code rewrites ~/.claude/settings.json at runtime (toggling plugins,
+# changing theme/model via /config), so chezmoi cannot own the whole file
 # without fighting it for every edit.
 #
 # As a modify_ script this receives the current file on stdin and writes the
@@ -16,10 +16,11 @@ input=$(cat)
 # Nothing to preserve on a fresh machine.
 [ -n "$input" ] || input='{}'
 
-# jq is installed by run_onchange_*-install-packages.sh, which sorts after
-# .claude/ in the apply order — so the first apply on a new machine can reach
-# this script before jq exists. Emit the managed keys and let a later apply
-# fill in the rest rather than failing the whole run.
+# On macOS jq comes from run_onchange_darwin-install-packages.sh, which sorts
+# after .claude/ in the apply order, so the first apply on a new Mac reaches
+# this script before jq exists. (The Linux package script runs before files.)
+# Emit the managed keys and let a later apply fill in the rest rather than
+# failing the whole run.
 if ! command -v jq >/dev/null 2>&1; then
     if [ "$input" = '{}' ]; then
         cat <<'EOF'

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# psql2csv — run a query through psql and get clean CSV on stdout.
+# psql2csv -- run a query through psql and get clean CSV on stdout.
 #
 # Usage:
 #   psql2csv [psql-options...] QUERY
@@ -81,7 +81,7 @@ if [[ -z "$query" ]]; then
   fi
 fi
 
-# Strip trailing semicolons — COPY (...) chokes on them.
+# Strip trailing semicolons; COPY (...) chokes on them.
 query=$(printf '%s' "$query" | sed -E 's/[[:space:]]*;[[:space:]]*$//')
 
 copy_opts="FORMAT csv"

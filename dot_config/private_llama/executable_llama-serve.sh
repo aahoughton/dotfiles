@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# llama-serve.sh — start llama-server for the primary local model.
+# llama-serve.sh -- start llama-server for the primary local model.
 #
 # Reads ~/.config/llama/models.lock.yaml for the model paths and verifies the
 # API key file exists before binding. Runs in the foreground; use your usual

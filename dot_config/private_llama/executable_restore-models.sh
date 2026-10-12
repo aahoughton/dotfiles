@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# restore-models.sh — rebuild the active model tree from models.lock.yaml.
+# restore-models.sh -- rebuild the active model tree from models.lock.yaml.
 #
 # Source order is archive first, Hugging Face second: the Dropbox archive is a
 # local copy of a known-good revision, so it is faster and does not depend on

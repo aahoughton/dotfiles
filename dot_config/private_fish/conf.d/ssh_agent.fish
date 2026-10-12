@@ -6,7 +6,7 @@ set -gx SSH_AUTH_SOCK "$HOME/.ssh/ssh_auth_sock"
 # 2. Start the agent unless one is actually reachable.
 # Testing for the socket file is not enough: a dead agent leaves its socket
 # behind, so `test -S` keeps succeeding while every connection is refused, and
-# the agent is never restarted. Probe the agent instead — ssh-add -l exits 2
+# the agent is never restarted. Probe the agent instead: ssh-add -l exits 2
 # when it can't be reached (0 = has keys, 1 = reachable but empty). The stale
 # socket has to go first, or ssh-agent -a refuses to bind to that path.
 ssh-add -l >/dev/null 2>&1

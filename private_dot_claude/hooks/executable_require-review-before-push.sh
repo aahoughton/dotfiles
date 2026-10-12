@@ -25,7 +25,7 @@
 #
 # Not wired to anything by default. chezmoi installs this script on every
 # machine and leaves it inert, because a gate that fires in every repo
-# taxes the ones where a bad push costs nothing — and taxes them on every
+# taxes the ones where a bad push costs nothing, and taxes them on every
 # added commit, since the marker is keyed to the diff rather than to the
 # branch.
 #
@@ -56,7 +56,7 @@
 #
 # `settings.local.json` and not `settings.json`, for two reasons. It is
 # personal and uncommitted (Claude Code adds it to the repo's .gitignore
-# when it first creates the file — worth confirming it did), so opting in
+# when it first creates the file; worth confirming it did), so opting in
 # does not impose the gate on anyone else working in the repo. And it
 # keeps the list of which repos are gated out of every tree, including
 # the dotfiles repo this script is managed in, which is public and would
