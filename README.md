@@ -29,6 +29,7 @@ question, or edit `~/.config/chezmoi/chezmoi.toml`.
 ```bash
 # laptop/desktop: open the 1Password app, then Settings > Developer >
 # "Integrate with 1Password CLI" to enable Touch ID unlock
+op signin          # approve in the app; each new shell needs this once
 op whoami          # should print your account
 
 # headless: a service account token instead
