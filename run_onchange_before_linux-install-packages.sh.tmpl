@@ -1,5 +1,8 @@
 {{ if eq .chezmoi.os "linux" -}}
 #!/bin/bash
+# before_: the installers below write shell rc files and Claude Code's
+# settings.json, which chezmoi also manages. Running first lets chezmoi's
+# versions win, so a fresh machine is clean after one apply.
 set -e
 
 # Update package list
@@ -16,9 +19,9 @@ if ! command -v mise &> /dev/null; then
     curl https://mise.run | sh
 fi
 
-# Install uv
+# Install uv. The managed shell configs already put ~/.local/bin on PATH.
 if ! command -v uv &> /dev/null; then
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_NO_MODIFY_PATH=1 sh
 fi
 
 # Install Claude Code

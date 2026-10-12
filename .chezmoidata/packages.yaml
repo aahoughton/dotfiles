@@ -113,5 +113,5 @@ packages:
       - 'jq'
       - 'nmap'
       # Note: mise, uv, xan, yq, jump may need separate installation
-      # See run_onchange_linux-install-packages.sh.tmpl
+      # See run_onchange_before_linux-install-packages.sh.tmpl
 
