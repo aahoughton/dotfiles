@@ -76,8 +76,8 @@ check "missing query is an error" \
 
 # The real (non-dry-run) path, under /bin/bash -- the shebang's interpreter,
 # 3.2 on macOS -- with a stub psql that echoes its arguments and stdin.
-# Bash 3.2 treats an empty array as unbound under set -u, so a query with no
-# other psql arguments used to fail here.
+# Bash 3.2 treats an empty array as unbound under set -u, so without
+# psql2csv's guard a query with no other psql arguments fails here.
 stub_dir=$(mktemp -d)
 printf '#!/bin/sh\necho "args: $*"; cat\n' >"$stub_dir/psql"
 chmod +x "$stub_dir/psql"

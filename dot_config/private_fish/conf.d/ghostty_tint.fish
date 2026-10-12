@@ -24,9 +24,8 @@
 #     exact mistake the tint exists to prevent
 #   - painting base ("cannot tell") is honest and costs nothing
 #
-# Earlier versions tried to find ssh anywhere in a command line -- after a
-# separator, behind a wrapper, past quoted spans. Three rounds of review found
-# a leak each time, ending with a quoted argument that could paint a specific
+# Finding ssh anywhere in a command line -- after a separator, behind a
+# wrapper, past quoted spans -- leaks: a quoted argument can paint a specific
 # remote host's colour during a plain local `echo`. Matching an unparsed shell
 # string has no clean bottom, so this only recognises the shapes actually
 # typed:
@@ -74,9 +73,9 @@ function __ghostty_tint_colour -a hex -d 'Print the canonical #rrggbb form of a 
 end
 
 function __ghostty_tint_canon -a name -d 'Canonical map key for a host name'
-    # Registration and lookup MUST agree, so both go through here -- an earlier
-    # split where only lookup stripped `.local` left `__ghostty_tint_add
-    # box.local` registered but permanently unreachable.
+    # Registration and lookup MUST agree, so both go through here: if only
+    # lookup stripped `.local`, `__ghostty_tint_add box.local` would register
+    # a key that no lookup ever produces.
     set -l h (string trim --chars="'\"" -- $name)
     # A separator glued to the destination (`ssh behemoth; echo x`) is not part
     # of the name. Cut at the first one rather than trimming the end, so
@@ -247,11 +246,11 @@ if status is-interactive
     and not set -q TMUX
 
     function __ghostty_tint_paint -a hex -d 'Set the surface background'
-        # Unconditional on purpose. Caching the last colour we sent saved a
-        # 20-byte write per prompt and cost correctness: anything else that
-        # sets the background -- including the printf used to audition a new
-        # tint -- left the cache describing a state that no longer existed,
-        # and the tab never returned to its own colour.
+        # Unconditional on purpose. A cache of the last colour sent would save
+        # a 20-byte write per prompt, but anything else that sets the
+        # background -- including the printf used to audition a new tint --
+        # leaves such a cache describing a state that no longer exists, and
+        # the tab never returns to its own colour.
         printf '\e]11;%s\a' $hex
     end
 

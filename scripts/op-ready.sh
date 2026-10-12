@@ -1,19 +1,17 @@
 #!/bin/sh
 # Answer "can `op` authenticate right now?" without ever blocking the caller.
 #
-# `.chezmoiignore` gates the 1Password-backed files on this answer. It used to
-# ask by running `op whoami` inline with no bound. On a machine where the
-# 1Password desktop app is prompting for approval that nobody is looking at, a
-# remote session or a headless box, that call never returns: every chezmoi
-# command hangs with no output, and `--debug` stops after reading
-# `.chezmoiignore` with no indication that a subprocess is waiting.
+# `.chezmoiignore` gates the 1Password-backed files on this answer. On a
+# machine where the 1Password desktop app is prompting for an approval nobody
+# is looking at (a remote session, a headless box), an unbounded `op whoami`
+# never returns: every chezmoi command would hang with no output, and
+# `--debug` stops after reading `.chezmoiignore` with no sign that a
+# subprocess is waiting. A `|| echo notready` guard does not help; it catches
+# a non-zero exit, not a call that never exits.
 #
-# The `|| echo notready` guard in the old form catches a non-zero exit, which
-# is a different failure from never exiting at all.
-#
-# Two changes. The call is bounded, so a machine that cannot reach 1Password
-# degrades to the same "skip the secret files" path a fresh machine takes. And
-# a wait long enough to look like a hang says what it is waiting for.
+# So the call is bounded, and a machine that cannot reach 1Password takes the
+# same "skip the secret files" path a fresh machine takes. A wait long enough
+# to look like a hang says what it is waiting for.
 #
 # Prints exactly `ready` or `notready` on stdout. Everything explanatory goes
 # to stderr, so the template only ever sees the verdict.

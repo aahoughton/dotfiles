@@ -36,12 +36,8 @@ Library/LaunchAgents/local.llama-agent.plist
   which is read once at init — so picking up the secrets needs no re-init.
 
   The check lives in `scripts/op-ready.sh` because it needs a bound and a
-  progress notice, and neither fits in a one-liner. Asking `op whoami` inline
-  with no bound hung every chezmoi command, silently, on a machine where the
-  1Password desktop app was prompting for an approval nobody was looking at.
-  `--debug` stopped after reading this file and said nothing further. A
-  `|| echo notready` guard answers a non-zero exit, which is a different
-  failure from never exiting.
+  progress notice, and neither fits in a one-liner; the script's header says
+  why an unbounded `op whoami` is not an option.
 
   `output` fails the whole template on a non-zero exit, so the script always
   exits 0 and puts its verdict on stdout. `lookPath` returns an empty string

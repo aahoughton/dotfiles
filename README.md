@@ -93,21 +93,6 @@ never deployed to `$HOME` — always run these by their full path.
 
 IntelliJ note: turn off shell integration in terminal settings.
 
-### Existing machines
-
-The AWS account ID, SSO start URL and 1Password mode used to be init prompts.
-A machine initialised before that still has them in
-`~/.config/chezmoi/chezmoi.toml`. Run `chezmoi init` once to drop them.
-
-History was rewritten on 2026-08-03 (AWS identifiers) and 2026-10-12 (an
-employer name), so commit SHAs changed. Any clone predating a rewrite has an
-unrelated history and will try to push the old commits back. On each one:
-
-```bash
-cd ~/.local/share/chezmoi
-git fetch origin && git reset --hard origin/main
-```
-
 ## 1Password
 
 ### How the bootstrap avoids a chicken-and-egg
