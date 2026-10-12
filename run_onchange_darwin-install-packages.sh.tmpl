@@ -11,18 +11,20 @@ set -e
 {{- $allCasks := concat .packages.darwin.casks (index $darwin "casks" | default list) -}}
 {{- /* skip-casks next to chezmoi.toml is local and unmanaged: one cask per
        line, # starts a comment. Listed casks are left out of brew bundle but
-       not uninstalled. A name not in this machine's cask lists fails the
-       template, so a typo cannot silently skip nothing. */ -}}
+       not uninstalled. A name not in this machine's cask lists (a typo, or a
+       cask since dropped from .chezmoidata) is ignored with a warning on every
+       render, so it cannot silently skip nothing. */ -}}
 {{- $skipFile := joinPath (osDir .chezmoi.configFile) "skip-casks" -}}
 {{- $skip := list -}}
 {{- if stat $skipFile -}}
 {{-   range splitList "\n" (include $skipFile) -}}
 {{-     $name := regexReplaceAll "#.*" . "" | trim -}}
 {{-     if $name -}}
-{{-       if not (has $name $allCasks) -}}
-{{-         fail (printf "%s: %q is not in this machine's cask lists" $skipFile $name) -}}
+{{-       if has $name $allCasks -}}
+{{-         $skip = append $skip $name -}}
+{{-       else -}}
+{{-         warnf "%s: %q is not in this machine's cask lists; ignoring it" $skipFile $name -}}
 {{-       end -}}
-{{-       $skip = append $skip $name -}}
 {{-     end -}}
 {{-   end -}}
 {{- end -}}

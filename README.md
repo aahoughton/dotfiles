@@ -185,9 +185,9 @@ tap cask. Changing which casks it lists re-runs the install script on the next
 apply. It does not uninstall anything; run `brew uninstall --cask <name>` for
 that.
 
-A name that is not in this machine's cask lists (shared plus its machine type)
-is an error, and it stops `chezmoi apply`, `status`, and a full `diff` until the
-file is fixed. That includes a cask later removed from `.chezmoidata`.
+A name that is not in this machine's cask lists (shared plus its machine type),
+such as a typo or a cask later removed from `.chezmoidata`, is ignored, with a
+warning on every `chezmoi apply`, `status` and `diff` until the file is fixed.
 
 `.ssh/config.local` is listed in `.chezmoiignore` so `chezmoi add` refuses it.
 Prefer this over editing a managed file directly — that edit will be reverted on
