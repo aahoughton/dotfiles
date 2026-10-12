@@ -60,10 +60,11 @@ pass 2 on (pass 1 runs before the machine has its name).
    - The server's data lives only in OrbStack's `atuin-db` volume, so after a
      wipe it starts with no accounts. Every client already has the right
      encryption key (chezmoi installs it from 1Password item `atuin-key`), so
-     register once and the other machines' history uploads unchanged.
-   - Then, on each other machine: `atuin logout`, `atuin login -u <username>`,
-     `atuin sync`. Their old session points at an account that no longer
-     exists.
+     register once, with the username and password in item `atuin-account`,
+     and the other machines' history uploads unchanged.
+   - Then, on each other machine: `atuin logout`, `atuin login -u <username>`
+     (password from `atuin-account`), `atuin sync`. Their old session points at
+     an account that no longer exists.
    - Any machine: history recorded before pass 2 was encrypted with a key atuin
      generated itself, which pass 2 replaces, so those records can no longer be
      decrypted. `atuin store purge` deletes them.
