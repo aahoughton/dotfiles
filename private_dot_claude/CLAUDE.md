@@ -61,11 +61,21 @@ Generated output (error messages, log lines) is ASCII-only, simple, and concise.
 
 ### Writing as me
 
-When drafting text I'll send as myself (Slack messages, email, GitHub issues and
-comments on other people's repos, review comments), read `~/.claude/writing-voice.md`
-first. It overrides Prose style for that text. Commit messages, code comments, docs, and
-PRs on my own repos stay under Prose style and Commits and PRs. If the file is missing,
-say so rather than guessing at my voice.
+When drafting text I'll send as myself (Slack messages, email, ticket comments, GitHub
+issues and comments on other people's repos, review comments), read
+`~/.claude/writing-voice.md` first. It overrides Prose style for that text. Commit
+messages, code comments, docs, and PRs on my own repos stay under Prose style and Commits
+and PRs. If the file is missing, say so rather than guessing at my voice.
+
+- Pick the register first (Slack DM vs channel vs broadcast, internal vs external) and
+  match the rates in the file's "How often" tables; don't stack its markers.
+- Give me the message ready to paste, in the target's own formatting: Slack mrkdwn
+  (`*bold*`, `_italic_`, `<url|text>`) for Slack, plain text for email. No commentary
+  around it unless I ask.
+- Draft only. Never send, post, or comment on my behalf.
+- If the content is a long document (a design write-up, a report), don't write the
+  message in report style: give me a short framing line in my voice and the document
+  separately, as the file describes.
 
 ## Tooling
 
