@@ -1,6 +1,9 @@
+{{- $tools := .packages.mise -}}
+{{- if eq .chezmoi.os "linux" }}{{ $tools = concat $tools .packages.linux.mise }}{{ end -}}
 #!/bin/bash
-# Adds packages.mise from .chezmoidata/packages.yaml to the global mise config
-# and installs them. Re-runs whenever that list changes.
+# Adds packages.mise from .chezmoidata/packages.yaml, plus packages.linux.mise
+# on Linux, to the global mise config and installs them. Re-runs whenever
+# either list changes.
 #
 # `mise use -g` sets only the keys it is given, so the config stays
 # machine-owned: tools added by hand on one machine are left alone. It is also
@@ -28,7 +31,7 @@ fi
 # An entry may list several versions of one tool, space-separated; they go to
 # one call so mise keeps them all, the first on PATH.
 failed=()
-for tool in{{ range .packages.mise }} {{ . | quote }}{{ end }}; do
+for tool in{{ range $tools }} {{ . | quote }}{{ end }}; do
     read -ra specs <<< "$tool"
     "$mise" use -g "${specs[@]}" || failed+=("$tool")
 done

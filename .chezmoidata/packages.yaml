@@ -96,12 +96,17 @@ packages:
       - 'zoom'
 
   linux:
-    # Core CLI tools (available on most distros)
+    # apt packages, installed by run_onchange_before_linux-install-packages.sh.tmpl
+    # (which also installs mise, uv and Claude Code).
     packages:
       # QUALITY OF LIFE
       - 'bash'
+      - 'fd-find'  # the command is fdfind; bin/symlink_fd.tmpl adds fd
       - 'fish'
+      - 'fzf'
       - 'htop'
+      - 'hx'  # helix
+      - 'mosh'
       - 'neovim'
       - 'ripgrep'
       - 'tmux'
@@ -110,8 +115,19 @@ packages:
       - 'curl'
       - 'direnv'
       - 'git'
+      - 'git-filter-repo'
       - 'jq'
+      - 'kcat'
       - 'nmap'
-      # Note: mise, uv, xan, yq, jump may need separate installation
-      # See run_onchange_before_linux-install-packages.sh.tmpl
-
+      - 'postgresql-client'  # psql; the libpq formula on macOS
+      - 'tcpflow'
+    # Linux-only `mise use -g` specs, installed after packages.mise. Tools that
+    # Ubuntu lacks, ships old, or ships as a different program (its yq is a
+    # Python jq wrapper). macOS gets these from Homebrew.
+    mise:
+      - 'atuin'
+      - 'fx'
+      - 'gh'
+      - 'yq'
+      - 'github:medialab/xan'
+      - 'github:gsamokovarov/jump'
