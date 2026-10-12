@@ -32,7 +32,7 @@ the problem domain, and how durable that structure will be as requirements evolv
 - Does the codebase use one approach consistently, or mix approaches that each
   require different mental models? (e.g., some routes use middleware chains,
   others use inline guards; some services use events, others use direct calls)
-- Inconsistency is often fine during transitions — look for evidence of transition
+- Inconsistency is often fine during transitions; look for evidence of transition
   vs. permanent incoherence
 
 **Naming and conceptual integrity**
@@ -70,3 +70,6 @@ the context.
 Return a markdown list of findings. Each finding: location, observed pattern,
 design consequence, severity, justification check. No summaries, no style
 complaints, no implementation suggestions that belong in a code review.
+
+Cite at least one `path:line` you read for every finding. A concern you can't
+pin to specific code goes in a separate "Leads" list at the end.

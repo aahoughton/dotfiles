@@ -1,8 +1,7 @@
 # Charitable Interpretation
 
 Architectural review agents must apply charitable interpretation before flagging
-anything as a problem. This is not about being lenient — it's about producing
-findings that are actually actionable and credible.
+anything as a problem. The point is findings that are actionable and credible.
 
 ## The principle
 

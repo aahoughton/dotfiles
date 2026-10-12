@@ -2,7 +2,7 @@
 
 ## Severity tiers
 
-### P1 – Critical
+### P1 - Critical
 Fix before adding significant new features.
 
 Criteria (any one is sufficient):
@@ -12,7 +12,7 @@ Criteria (any one is sufficient):
 - Fundamental mismatch between the domain and the code structure that is actively
   causing bugs or slowing every feature
 
-### P2 – Significant
+### P2 - Significant
 Fix on the next major refactor or before the next growth phase.
 
 Criteria:
@@ -21,7 +21,7 @@ Criteria:
 - Abstraction quality problems that complicate onboarding and reasoning
 - Coupling that will require broad changes when requirements shift (and they will)
 
-### P3 – Suggestions
+### P3 - Suggestions
 Worth doing, low urgency.
 
 Criteria:
@@ -42,9 +42,9 @@ Include these because:
 Each issue entry:
 
 ```
-### [Title — specific, not generic]
+### [Title: specific, not generic]
 
-**Location**: `path/to/file.ext` (line range if applicable)
+**Location**: `path/to/file.ext:line` (the code that shows the pattern)
 
 **Pattern**: What the code does.
 
@@ -66,7 +66,7 @@ that justification? (If you found evidence, this item probably belongs in Noted/
 - Flag things that are fine ("uses a class instead of a function")
 - Flag things that belong in a code review, not an arch review ("this function
   is too long")
-- Repeat the same root cause as multiple issues — find the root and say it once
+- Repeat the same root cause as multiple issues; find the root and say it once
 - Use severity P1 for everything (it loses meaning)
 - List issues without recommendations
 
@@ -83,18 +83,18 @@ that justification? (If you found evidence, this item probably belongs in Noted/
 
 ## Context
 
-[2–3 sentences on project type, stack, and anything from orientation that
+[2-3 sentences on project type, stack, and anything from orientation that
  shapes the findings below.]
 
-## P1 – Critical
+## P1 - Critical
 
 [Issues or "None identified."]
 
-## P2 – Significant
+## P2 - Significant
 
 [Issues or "None identified."]
 
-## P3 – Suggestions
+## P3 - Suggestions
 
 [Issues or "None identified."]
 

@@ -1,6 +1,12 @@
 ---
 name: diff-reviewer
-description: Reviews a staged diff or named sha range from fresh context before commit.
+description: >
+  Fresh-context review of a diff you did not write (staged changes, a sha
+  range, a branch, or a patch file), typically before committing. Traces each
+  changed contract to its consumers and sibling code paths, and reports only
+  defects it has reproduced with a concrete input and wrong output. Read-only.
+  Use it for a deep check of how a change propagates; use /code-review for a
+  broad review of a branch.
 tools: Read, Grep, Glob, Bash
 model: opus
 ---
@@ -52,16 +58,16 @@ Start with enumeration. Do not start by judging whether the patch looks plausibl
    For one symbol or one finite family, inspect up to 25 consumer sites. Spend the cap in this order: changed files and tests first, same-directory and same-family consumers next, same-package consumers next, then remaining consumers sorted by path and line number. If there are more, say how many were found, inspect the capped set, and report the omitted count in the `Review coverage` header and `Enumeration Notes`. Silent truncation is a review failure.
 
 5. Turn consumers into observable surfaces.
-   For each affected consumer or finite-family member, name the user-visible surface that can show drift: validator verdict, lint issue, thrown error, emitted artifact, route response, adapter callback, or documented API. Where two spellings or adapters are meant to agree, run the same input through both and compare the outputs.
+   For each affected consumer or finite-family member, name where drift would show: a return value, a thrown error or exit code, an output or log line, an HTTP response, a written file, or documented behavior. Where two code paths are meant to agree, run the same input through both and compare the outputs.
 
 6. For each changed function, enumerate paths through the changed behavior.
    Include early returns, error paths, async callback windows, report-only or log-only callbacks, default and custom options, and cleanup or unmark steps. For each path, state whether a test or command exercises it.
 
 7. Compare sibling behavior.
-   When this repo has paired adapters, paired keyword spellings, paired request/response APIs, sync/async variants, or old/new dialect spellings, check both sides. A change that fixes one spelling or adapter often needs the sibling to agree or to differ for a stated reason.
+   When the repo has paired implementations (adapters for different backends, sync and async variants, old and new API versions, request and response handlers, per-shell versions of one script), check both sides. A change that fixes one side often needs the other to agree, or to differ for a stated reason.
 
 8. Reproduce before reporting a defect.
-   A finding needs an input and a wrong output. Use an existing test when it covers the path. Otherwise run the smallest probe you can: a targeted unit test, a one-off script, or a real-server injection for adapter behavior. If you cannot execute the repro in the available environment, move it to `Questions / leads`, not `Findings`.
+   A finding needs an input and a wrong output. Use an existing test when it covers the path. Otherwise run the smallest probe you can: a targeted unit test, a one-off script, or a request against a locally running service. If you cannot execute the repro in the available environment, move it to `Questions / leads`, not `Findings`.
 
 ## What Counts
 

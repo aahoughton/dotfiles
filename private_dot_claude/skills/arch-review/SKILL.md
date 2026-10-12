@@ -7,9 +7,10 @@ description: >
   code quality at a system level, or evaluate design decisions. Triggers on
   phrases like "review the architecture", "audit this codebase", "what's wrong
   with this repo", "assess the design", or "what would be hard to change here".
-  Reviews the whole repo, not a diff — for reviewing the changes on a branch
+  Reviews the whole repo, not a diff; for reviewing the changes on a branch
   before merging, use branch-review instead. Spawns three parallel specialist
-  agents and returns a single prioritized issue list.
+  agents and returns a single prioritized issue list. Pass a subdirectory to
+  limit the review to it on large repos.
 ---
 
 # Architectural Review
@@ -18,9 +19,17 @@ You are orchestrating a senior-level architectural review. Three specialists ana
 the repo in parallel, each with a narrow mandate. You synthesize their findings into
 a single prioritized issue list.
 
+## Scope
+
+If $ARGUMENTS names a directory, review only that subtree; orientation still
+reads the repo root for context. Otherwise review the whole repo. Pass the scope
+to every agent.
+
 ## Orientation (do this first)
 
-Before spawning agents, spend 2–3 minutes orienting yourself. Use bash/grep/ls to:
+Before spawning agents, orient yourself. Keep it short: read the README and the
+top-level manifests (`package.json`, `pyproject.toml`, `go.mod`, etc.), list the
+top two directory levels, and skim any ADR or design docs. Use bash/grep/ls to:
 
 1. Identify the project type (web app, library, service, monorepo, etc.)
 2. Identify the primary language(s) and frameworks
@@ -38,9 +47,9 @@ Spawn these three agents **in parallel**, providing each with:
 - Their specific mandate (from `agents/` below)
 
 Agents:
-- `agents/composability.md` — module boundaries, coupling, dependency management
-- `agents/testability.md` — seam design, test isolation, coverage patterns
-- `agents/design.md` — data models, abstractions, naming, structural patterns
+- `agents/composability.md`: module boundaries, coupling, dependency management
+- `agents/testability.md`: seam design, test isolation, coverage patterns
+- `agents/design.md`: data models, abstractions, naming, structural patterns
 
 Read those files before dispatching so you can give agents accurate framing.
 
@@ -48,21 +57,25 @@ Read those files before dispatching so you can give agents accurate framing.
 
 Each agent returns findings with severity and justification. Your job:
 
-1. **De-duplicate**: If two agents flag the same root cause, merge into one issue.
-2. **Promote context**: If the orientation phase found a design doc explaining a
-   pattern, note that in the relevant issue — it may reduce severity or explain intent.
-3. **Apply the charitable interpretation rule** (see `references/charitable-interpretation.md`).
-4. **Rank** using the criteria in `references/issue-format.md`.
-5. Emit the final report.
+1. **Check evidence**: Every finding must cite a `path:line` the agent read.
+   Open the cited lines for each P1 and P2 and confirm they show the pattern
+   described. Demote or drop findings that don't hold up; move findings with no
+   citation to "Out of scope / needs more context".
+2. **De-duplicate**: If two agents flag the same root cause, merge into one issue.
+3. **Promote context**: If the orientation phase found a design doc explaining a
+   pattern, note that in the relevant issue; it may reduce severity or explain intent.
+4. **Apply the charitable interpretation rule** (see `references/charitable-interpretation.md`).
+5. **Rank** using the criteria in `references/issue-format.md`.
+6. Emit the final report.
 
 ## Output Format
 
 Read `references/issue-format.md` for the exact output structure. In brief:
 
 ```
-## P1 – Critical (fix before adding features)
-## P2 – Significant (fix on next major refactor)
-## P3 – Suggestions (worth doing, low urgency)
+## P1 - Critical (fix before adding features)
+## P2 - Significant (fix on next major refactor)
+## P3 - Suggestions (worth doing, low urgency)
 ## Noted / Intentional (patterns that look like smells but appear justified)
 ```
 
