@@ -4,9 +4,11 @@
 # the server reads at startup changes, so apply leaves the running server
 # matching the repo.
 #
-# Holds off until the API key exists; .chezmoiignore holds back the plist on
-# the same test. Whether the key exists is part of this script's contents, so
-# the first apply after fetching it runs this again.
+# Holds off until the API key exists. chezmoi renders run_onchange_after_
+# scripts after writing files, so the apply that first writes the key (the
+# first one after 1Password sign-in, with the plist) sees it here and loads
+# the agent. Whether the key exists is part of this script's contents, so that
+# apply runs this again.
 #
 # plist: {{ include "Library/LaunchAgents/local.llama-agent.plist.tmpl" | sha256sum }}
 # llama-agent.sh: {{ include "dot_config/private_llama/executable_llama-agent.sh" | sha256sum }}

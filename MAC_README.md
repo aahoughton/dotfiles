@@ -60,19 +60,14 @@ After running the bootstrap from [README.md](README.md), the following are handl
      only once the disk is unlocked. Use `sudo fdesetup authrestart` for
      planned reboots.
 8. **Behemoth only:** Local LLM. `~/.config/llama/` and `~/.pi/` arrive with the
-   first apply; the weights and the API key do not.
-   - Recover the server API key. It is deliberately unmanaged, because this repo
-     is public:
-     ```
-     op read "op://dotfiles/llama-api-key/credential" \
-       > ~/.config/llama/api-key && chmod 600 ~/.config/llama/api-key
-     ```
+   first apply. The API key (from 1Password item `llama-api-key`) and the
+   `local.llama-agent` LaunchAgent arrive with the first apply after 1Password
+   sign-in. The weights do not.
    - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
-   - Run `chezmoi apply`. Once the key exists it installs and loads the
-     `local.llama-agent` LaunchAgent, which runs `llama-agent.sh` (the server
-     plus the step 9 tools) at login and restarts it if it exits. Until
-     SearXNG is up it fails and retries every 30s. An apply that changes the
+   - The LaunchAgent runs `llama-agent.sh` (the server plus the step 9 tools)
+     at login and restarts it if it exits. Until the weights and SearXNG are
+     in place it fails and retries every 30s. An apply that changes the
      llama scripts, `mcp-servers.json` or `models.lock.yaml` restarts it. Log:
      `~/Library/Logs/llama-agent.log`.
    - `launchctl bootout gui/$(id -u)/local.llama-agent` stops it until the
