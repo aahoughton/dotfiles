@@ -1,4 +1,4 @@
-{{/* Targets chezmoi deletes on apply. Renamed files only; each entry can go
+{{/* Targets chezmoi deletes on apply: renamed or replaced files. Each entry can go
      once every machine has applied past the rename.
 
      The old server key goes only once its replacement exists, so an apply
@@ -7,3 +7,5 @@
 {{ if stat (joinPath .chezmoi.homeDir ".ssh/server_ed25519") -}}
 .ssh/behemoth_ed25519
 {{ end -}}
+{{/* Replaced by bin/git-branch-status, which the fish function would shadow. */}}
+.config/fish/functions/git-branch-status.fish
