@@ -88,9 +88,9 @@ The AWS account ID, SSO start URL and 1Password mode used to be init prompts.
 A machine initialised before that still has them in
 `~/.config/chezmoi/chezmoi.toml`. Run `chezmoi init` once to drop them.
 
-History was rewritten on 2026-08-03 to redact AWS identifiers, so every commit
-SHA changed. Any clone predating that has an unrelated history and will try to
-push the old commits back. On each one:
+History was rewritten on 2026-08-03 (AWS identifiers) and 2026-10-12 (an
+employer name), so commit SHAs changed. Any clone predating a rewrite has an
+unrelated history and will try to push the old commits back. On each one:
 
 ```bash
 cd ~/.local/share/chezmoi
