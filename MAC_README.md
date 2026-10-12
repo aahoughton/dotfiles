@@ -130,10 +130,3 @@ Alternatively, retire the old machine first and give the new one the old name
 step 1 is just `chezmoi update`. Each client's `~/.ssh/known_hosts` still holds
 the old machine's host key under that name (`HostKeyAlias`); remove it with
 `ssh-keygen -R <name>`.
-
-## Optional Software
-
-Not included in the automated install — evaluate per-machine:
-
-- **Transcription:** [superwhisper](https://superwhisper.com), if the installed Fluid Voice falls short
-- **Menu bar management:** Barbee (App Store)
