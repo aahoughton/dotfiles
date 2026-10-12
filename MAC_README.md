@@ -24,6 +24,14 @@ pass 2 on (pass 1 runs before the machine has its name).
 1. Disable Apple's built-in password manager: System Settings > Passwords > Password Options > uncheck "Autofill Passwords and Passkeys"
 2. Use Quad9 DNS (System Settings > Network > Wi-Fi > <SSID> > Details)
 3. Go through each installed cask and finalize setup
+   - Hyperkey: hold Caps Lock for hyper. Hyper only needs to be
+     cmd+opt+shift, for Safari's profile switches (cmd-opt-shift-0 and -1).
+     Hyperkey stores the modifiers as an NSEvent flag mask in `hyperFlags`
+     (1835008, or 0x1C0000, is cmd+opt+ctrl). With Hyperkey quit, set
+     cmd+opt+shift (0x1A0000), then reopen it:
+     ```
+     defaults write com.knollsoft.Hyperkey hyperFlags -int 1703936
+     ```
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
 6. **Desktop only:** Tailscale. The desktop gets the `tailscale` formula
