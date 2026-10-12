@@ -3,15 +3,11 @@
        machine-specific package set. */}}
 {{- $machineType := promptStringOnce . "machineType" "Machine type (desktop/laptop)" "" -}}
 {{- $machineName := promptStringOnce . "machineName" "Machine name (e.g. aah-mbp)" "" -}}
-{{- $awsAccountId := promptStringOnce . "awsAccountId" "AWS account ID (blank to skip AWS config)" "" -}}
-{{- $awsSsoStartUrl := promptStringOnce . "awsSsoStartUrl" "AWS SSO start URL (blank to skip)" "" -}}
 {{- $onepasswordMode := promptStringOnce . "onepasswordMode" "1Password mode (account = desktop app, service = token)" "account" -}}
 
 [data]
     machineType = {{ $machineType | quote }}
     machineName = {{ $machineName | quote }}
-    awsAccountId = {{ $awsAccountId | quote }}
-    awsSsoStartUrl = {{ $awsSsoStartUrl | quote }}
     # Stored here only so promptStringOnce reuses it; [onepassword] mode is
     # what chezmoi reads.
     onepasswordMode = {{ $onepasswordMode | quote }}

@@ -1,29 +1,31 @@
+{{- $accountId := onepasswordRead "op://dotfiles/aws-sso/account-id" -}}
+{{- $startUrl := onepasswordRead "op://dotfiles/aws-sso/sso-start-url" -}}
 [default]
 region = us-west-2
 output = json
 
 [sso-session roarmouse]
-sso_start_url = {{ .awsSsoStartUrl }}
+sso_start_url = {{ $startUrl }}
 sso_region = us-west-2
 sso_registration_scopes = sso:account:access
 
 [profile admin]
 sso_session = roarmouse
-sso_account_id = {{ .awsAccountId }}
+sso_account_id = {{ $accountId }}
 sso_role_name = AdministratorAccess
 region = us-west-2
 output = json
 
 [profile poweruser]
 sso_session = roarmouse
-sso_account_id = {{ .awsAccountId }}
+sso_account_id = {{ $accountId }}
 sso_role_name = PowerUserAccess
 region = us-west-2
 output = json
 
 [profile readonly]
 sso_session = roarmouse
-sso_account_id = {{ .awsAccountId }}
+sso_account_id = {{ $accountId }}
 sso_role_name = ReadOnlyAccess
 region = us-west-2
 output = json

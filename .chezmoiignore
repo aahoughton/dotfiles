@@ -81,14 +81,5 @@ Library/LaunchAgents/local.llama-agent.plist
 .ssh/github_ed25519
 .ssh/authorized_keys
 .claude/writing-voice.md
-{{ end }}
-
-{{/* AWS identifiers come from init prompts, not 1Password — they are not
-     secrets, and prompting keeps .aws/config out of the gate above.
-
-     `get` rather than `.awsAccountId` so a machine initialised before these
-     prompts existed skips the file instead of failing the whole template.
-     Run `chezmoi init` on such a machine to be prompted for the values. */}}
-{{ if not (get . "awsAccountId") }}
 .aws/config
 {{ end }}

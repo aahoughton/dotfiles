@@ -19,8 +19,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aahoughton/dotfiles
 
 This installs packages (including 1Password) and deploys every config that
 doesn't depend on the vault. It will ask for a machine type, a machine name, and
-the AWS account ID and SSO start URL (leave both blank to skip `.aws/config`).
-Answers are stored, blanks included, and a plain `chezmoi init` never asks
+the 1Password mode. Answers are stored, and a plain `chezmoi init` never asks
 again. To change one later, run `chezmoi init --prompt`, which repeats every
 question, or edit `~/.config/chezmoi/chezmoi.toml`.
 
@@ -73,19 +72,9 @@ IntelliJ note: turn off shell integration in terminal settings.
 
 ### Existing machines
 
-The AWS identifiers and the 1Password mode moved into init-time prompts, which
-are read once and cached in `~/.config/chezmoi/chezmoi.toml`. A machine set up
-before that change won't have them, and will skip `.aws/config` until re-prompted:
-
-```bash
-chezmoi init          # prompts for missing values only, keeps existing answers
-chezmoi diff          # check nothing local gets reverted
-chezmoi apply
-```
-
-`init` also asks for the 1Password mode. Accept the default unless the machine
-has no GUI. Note this changes the laptop from `service` to `account`: it had a
-hardcoded `service` mode before the mode became a per-machine choice.
+The AWS account ID and SSO start URL used to be init prompts; they now come
+from 1Password. A machine initialised before that still has them in
+`~/.config/chezmoi/chezmoi.toml`. Run `chezmoi init` once to drop them.
 
 History was rewritten on 2026-08-03 to redact AWS identifiers, so every commit
 SHA changed. Any clone predating that has an unrelated history and will try to
@@ -111,9 +100,9 @@ missing script is a hard error rather than a silent skip.
 
 `.chezmoiignore` then gates the vault-backed files on `scripts/op-ready.sh`,
 which answers "can `op` authenticate right now?" under a 15s bound. On
-`notready` it skips `.ssh/behemoth_ed25519`, `.ssh/github_ed25519`,
-`.ssh/authorized_keys`, and `.claude/writing-voice.md`, and the apply otherwise
-succeeds.
+`notready` it skips every file listed in that block of `.chezmoiignore` (the
+keys, the AWS config, and anything else read from the vault), and the apply
+otherwise succeeds.
 
 The desktop **app** is a brew cask, installed later with the rest of the
 packages. So the order is: CLI (hook), every non-secret file, app (cask), sign
