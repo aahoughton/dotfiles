@@ -22,7 +22,9 @@ After running the bootstrap from [README.md](README.md), the following are handl
 3. Go through each installed cask and finalize setup
 4. LaunchBar: hide dock icon
 5. Backblaze: install manually (cask doesn't work) and exclude OrbStack data directory
-6. **Behemoth only:** Start OrbStack, then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server, then follow the account steps it prints.
+6. **Behemoth only:** Start OrbStack and turn on start at login
+   (`orb config set app.start_at_login true`; it defaults to off, and the
+   containers only come back when OrbStack does). Then run `~/.local/share/chezmoi/scripts/setup-atuin-server.sh` to start the atuin sync server, then follow the account steps it prints.
    - The server's data lives only in OrbStack's `atuin-db` volume, so after a
      wipe it starts with no accounts. The other machines still hold the old
      encryption key, and behemoth's client has generated a new one. Before
