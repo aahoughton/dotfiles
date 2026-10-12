@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps the local LLM server running. Loaded by
+  run_onchange_after_load-llama-agent.sh.
+
+  KeepAlive covers crashes and the race with OrbStack at login:
+  llama-agent.sh exits while SearXNG is down, and launchd retries every
+  ThrottleInterval seconds until it is up.
+
+  launchd expands neither ~ nor $HOME, hence the template. PATH needs
+  /opt/homebrew/bin for llama-server and yq, and /usr/local/bin for
+  OrbStack's docker, which runs the search MCP server.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>local.llama-agent</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ .chezmoi.homeDir }}/.config/llama/llama-agent.sh</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>StandardOutPath</key>
+    <string>{{ .chezmoi.homeDir }}/Library/Logs/llama-agent.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{ .chezmoi.homeDir }}/Library/Logs/llama-agent.log</string>
+</dict>
+</plist>

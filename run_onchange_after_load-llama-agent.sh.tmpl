@@ -1,0 +1,48 @@
+{{ if and (eq .chezmoi.os "darwin") (eq .machineType "desktop") -}}
+#!/bin/bash
+# Loads the llama-agent LaunchAgent, and reloads it when the plist or any file
+# the server reads at startup changes, so apply leaves the running server
+# matching the repo.
+#
+# Holds off until the API key exists; .chezmoiignore holds back the plist on
+# the same test. Whether the key exists is part of this script's contents, so
+# the first apply after fetching it runs this again.
+#
+# plist: {{ include "Library/LaunchAgents/local.llama-agent.plist.tmpl" | sha256sum }}
+# llama-agent.sh: {{ include "dot_config/private_llama/executable_llama-agent.sh" | sha256sum }}
+# llama-serve.sh: {{ include "dot_config/private_llama/executable_llama-serve.sh" | sha256sum }}
+# mcp-servers.json: {{ include "dot_config/private_llama/mcp-servers.json" | sha256sum }}
+# models.lock.yaml: {{ include "dot_config/private_llama/models.lock.yaml" | sha256sum }}
+# api-key present: {{ if stat (joinPath .chezmoi.homeDir ".config/llama/api-key") }}yes{{ else }}no{{ end }}
+set -euo pipefail
+
+label=local.llama-agent
+plist="$HOME/Library/LaunchAgents/$label.plist"
+domain="gui/$(id -u)"
+
+if [ ! -s "$HOME/.config/llama/api-key" ]; then
+    echo "llama-agent: no API key yet, not loading $label (MAC_README step 8)" >&2
+    exit 0
+fi
+
+# Over ssh with nobody logged in at the console there is no GUI domain to
+# load into. launchd loads the agent at the next login. With someone logged
+# in, loading into their GUI domain from ssh works.
+if ! launchctl print "$domain" >/dev/null 2>&1; then
+    echo "llama-agent: no GUI session, $label loads at next login" >&2
+    exit 0
+fi
+
+# bootout returns before the job is gone, and bootstrap fails while it is
+# still there.
+launchctl bootout "$domain/$label" 2>/dev/null || true
+for _ in $(seq 1 30); do
+    launchctl print "$domain/$label" >/dev/null 2>&1 || break
+    sleep 1
+done
+if launchctl print "$domain/$label" >/dev/null 2>&1; then
+    echo "llama-agent: $label still unloading after 30s, re-run chezmoi apply" >&2
+    exit 1
+fi
+launchctl bootstrap "$domain" "$plist"
+{{ end -}}

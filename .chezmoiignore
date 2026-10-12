@@ -38,6 +38,15 @@ scripts/
 {{ if ne .machineType "desktop" }}
 .config/llama
 .pi
+Library/LaunchAgents/local.llama-agent.plist
+{{ end }}
+
+{{/* launchd loads every plist in LaunchAgents at login, so the plist itself
+     waits for the API key, or a reboot before MAC_README step 8 would start a
+     server that fails every 30s. run_onchange_after_load-llama-agent.sh
+     renders the same test, so the plist and its first load land in one apply. */}}
+{{ if not (stat (joinPath .chezmoi.homeDir ".config/llama/api-key")) }}
+Library/LaunchAgents/local.llama-agent.plist
 {{ end }}
 
 {{/*

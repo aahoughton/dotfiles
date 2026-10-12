@@ -69,7 +69,16 @@ After running the bootstrap from [README.md](README.md), the following are handl
      ```
    - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
-   - Start the server: `~/.config/llama/llama-serve.sh`
+   - Run `chezmoi apply`. Once the key exists it installs and loads the
+     `local.llama-agent` LaunchAgent, which runs `llama-agent.sh` (the server
+     plus the step 9 tools) at login and restarts it if it exits. Until
+     SearXNG is up it fails and retries every 30s. An apply that changes the
+     llama scripts, `mcp-servers.json` or `models.lock.yaml` restarts it. Log:
+     `~/Library/Logs/llama-agent.log`.
+   - `launchctl bootout gui/$(id -u)/local.llama-agent` stops it until the
+     next login; `launchctl disable` with the same target keeps it off
+     (`enable` undoes it). For the plain server with no tools, stop it and run
+     `~/.config/llama/llama-serve.sh`.
    - Expose it to the tailnet. The server binds loopback, so without this only
      this machine can reach it. Persists across reboots:
      ```
@@ -89,9 +98,8 @@ After running the bootstrap from [README.md](README.md), the following are handl
      ```
      docker compose -f ~/.config/llama/searxng/compose.yaml up -d
      ```
-   - Start the server with tools instead of the plain one:
-     `~/.config/llama/llama-agent.sh`
-   - Check it: `curl -s localhost:8889/healthz` should return `OK`, and
+   - The LaunchAgent from step 8 picks it up within 30s. Check it:
+     `curl -s localhost:8889/healthz` should return `OK`, and
      `curl -s -H "Authorization: Bearer $(cat ~/.config/llama/api-key)"
      localhost:8080/tools | jq length` should return 4.
 
