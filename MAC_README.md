@@ -65,7 +65,7 @@ After running the bootstrap from [README.md](README.md), the following are handl
      op read "op://dotfiles/behemoth_llama-server/credential" \
        > ~/.config/llama/api-key && chmod 600 ~/.config/llama/api-key
      ```
-   - Restore the weights (~30 GB, archive first, falling back to Hugging Face,
+   - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
    - Start the server: `~/.config/llama/llama-serve.sh`
    - Expose it to the tailnet. The server binds loopback, so without this only
