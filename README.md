@@ -25,18 +25,36 @@ Prerequisites:
 No SSH key or 1Password sign-in is needed up front: the first pass clones over
 https and skips anything it can't decrypt yet.
 
-**Pass 1 — everything that isn't a secret:**
+**Pass 1: everything that isn't a secret.** Install chezmoi and clone the
+repo. `init` asks for a machine type and a machine name and writes
+`~/.config/chezmoi/chezmoi.toml`; nothing else in your home directory changes
+yet.
+
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply aahoughton/dotfiles
+# macOS: chezmoi from Homebrew, which keeps it updated from here on
+brew install chezmoi
+chezmoi init aahoughton/dotfiles
+
+# Linux: the installer puts chezmoi in ./bin, so run it from ~
+cd ~ && sh -c "$(curl -fsLS get.chezmoi.io)" -- init aahoughton/dotfiles
+```
+
+Before applying, decide whether this machine skips any casks (macOS). To skip
+some, list them in `~/.config/chezmoi/skip-casks`, one per line, named exactly
+as in `.chezmoidata/packages.yaml` or `packages_<type>.yaml` under
+`~/.local/share/chezmoi` (see [Conventions](#conventions)). Then apply:
+
+```bash
+chezmoi apply          # Linux: ~/bin/chezmoi apply
 ```
 
 This installs packages (including 1Password) and deploys every config that
-doesn't depend on the vault. It will ask for a machine type and a machine name.
-Answers are stored, and a plain `chezmoi init` never asks again. To change one
-later, run `chezmoi init --prompt`, which repeats every question, or edit
+doesn't depend on the vault. The init answers are stored, and a plain
+`chezmoi init` never asks again. To change one later, run
+`chezmoi init --prompt`, which repeats every question, or edit
 `~/.config/chezmoi/chezmoi.toml`.
 
-**Pass 2 — the secrets.** Sign in to 1Password, then:
+**Pass 2: the secrets.** Sign in to 1Password, then:
 
 ```bash
 # open the 1Password app, then Settings > Developer >
@@ -56,13 +74,6 @@ whether `op` can authenticate on every apply, so nothing needs re-running beyond
 See [1Password](#1password) for how the gate works.
 
 ### Post-install
-
-**macOS:** pass 1 installs chezmoi from Homebrew, which owns updates from then
-on. Delete the bootstrap copy, which would otherwise shadow it on `PATH`:
-
-```bash
-rm ~/bin/chezmoi
-```
 
 Update the chezmoi git origin to use `ssh` instead of `https`:
 ```bash
