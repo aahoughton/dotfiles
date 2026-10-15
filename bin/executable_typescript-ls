@@ -1,8 +1,7 @@
 #!/bin/bash
 #
-# typescript-ls -- typescript-language-server for editors (ttt, helix). ttt
-# defaults to `tsc --lsp`; point its "typescript" server here for a project
-# that needs its own TypeScript 5.x or 6.
+# typescript-ls -- typescript-language-server for editors (ttt, helix).
+# ttt defaults to `tsc --lsp`.
 #
 # Runs the server on LTS Node whatever the project pins; it needs Node 22+.
 # The server uses the workspace's own TypeScript when it has a tsserver.js.
