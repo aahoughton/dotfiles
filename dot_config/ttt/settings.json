@@ -5,7 +5,7 @@
         "command": ["gopls"]
       },
       "typescript": {
-        "command": ["typescript-ls", "--stdio"],
+        "command": ["tsc", "--lsp", "--stdio"],
         "languages": {
           ".ts": "typescript",
           ".mts": "typescript",

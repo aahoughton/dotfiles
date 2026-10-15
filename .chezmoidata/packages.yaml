@@ -10,9 +10,11 @@ packages:
   # and do not need Node at all.
   #
   # Language servers are for ttt. gopls is a native binary and uses the
-  # project's go only to load packages. typescript-language-server runs
-  # through bin/typescript-ls, which pins it to LTS Node and falls back to
-  # TypeScript 6 (the last release with tsserver.js); `tsc` on PATH is 7.
+  # project's go only to load packages. ttt runs TypeScript 7's `tsc --lsp`
+  # (the `tsc` on PATH), which checks every project with 7. For a project
+  # that needs its own 5.x or 6, bin/typescript-ls runs
+  # typescript-language-server on LTS Node and falls back to TypeScript 6
+  # (the last release with tsserver.js).
   mise:
     - 'node@lts'
     - 'go'
