@@ -11,8 +11,8 @@
       },
       "models": [
         {
-          "id": "qwen3.8-27b",
-          "name": "Qwen3.8 27B Q8_0 (behemoth, local)",
+          "id": "swift-qwen3.8-27b",
+          "name": "Swift Qwen3.8 27B Q8_0 (behemoth, local)",
           "reasoning": true,
           "input": [
             "text",

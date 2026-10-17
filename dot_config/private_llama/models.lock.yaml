@@ -17,7 +17,9 @@ min_llama_cpp: "0.4.0"
 
 models:
   - name: qwen3.8-27b
-    role: primary
+    role: candidate
+    # Kept as the fallback to swap back to. llama-serve.sh only ever loads
+    # role: primary.
     repo: unsloth/Qwen3.8-27B-GGUF
     revision: 4ca720788d1e01f1bff70c033e0d0028fd02e502
     # Short revision is the on-disk directory name under <root>/<repo>/.
@@ -39,10 +41,10 @@ models:
         sha256: cbb841a9ee0636b2ec172f5bb8df2ea8dfeb01e90fe7c6126581d662a0b4e43e
 
   - name: swift-qwen3.8-27b
-    role: candidate
-    # Third-party fine-tune of the primary's base model, trained to emit fewer
-    # reasoning tokens. Held as a candidate while it is evaluated on real
-    # agentic sessions; llama-serve.sh only ever loads role: primary.
+    role: primary
+    # Third-party fine-tune of Qwen/Qwen3.8-27B, trained to emit fewer
+    # reasoning tokens. Carries the same MTP head (blk.64.nextn.*) as the base
+    # model, so llama-serve.sh's speculative-decoding flags apply unchanged.
     repo: ukisai/Swift-Qwen3.8-27B-GGUF
     revision: b12fc8f44af7bdf31a3c3309891acb345d3106a2
     revision_short: b12fc8f44af7
