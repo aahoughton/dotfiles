@@ -1,5 +1,3 @@
-# CLAUDE.md
-
 ## Working principles
 
 How to decide, not just how to execute. These apply across every repo.
@@ -63,7 +61,7 @@ Generated output (error messages, log lines) is ASCII-only, simple, and concise.
 
 When drafting text I'll send as myself (Slack messages, email, ticket comments, GitHub
 issues and comments on other people's repos, review comments), read
-`~/.claude/writing-voice.md` first. It overrides Prose style for that text. Commit
+`~/.agents/writing-voice.md` first. It overrides Prose style for that text. Commit
 messages, code comments, docs, and PRs on my own repos stay under Prose style and Commits
 and PRs. If the file is missing, say so rather than guessing at my voice.
 
@@ -113,8 +111,8 @@ projects that pin another.
 ## Commits and PRs
 
 - No attribution trailers or generated-by footers in commit messages or PR bodies
-  (`Co-Authored-By`, `Claude-Session`, "Generated with Claude Code"). This rule wins
-  over the harness default.
+  (`Co-Authored-By`, session links, "Generated with ..." lines). This rule wins over
+  any default the agent harness sets.
 - Commit messages are ASCII-only, with conventional subjects (`feat:`, `fix:`,
   `refactor:`, `test:`, `chore:`, etc.).
 - Write commit and PR bodies from the final diff; every claim must match a change in it.

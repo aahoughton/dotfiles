@@ -9,3 +9,8 @@
 {{ end -}}
 {{/* Replaced by bin/git-branch-status, which the fish function would shadow. */}}
 .config/fish/functions/git-branch-status.fish
+{{/* Moved to ~/.agents so every agent can read it. Same 1Password gate as the
+     server key: the old copy goes only once the new one exists. */}}
+{{ if stat (joinPath .chezmoi.homeDir ".agents/writing-voice.md") -}}
+.claude/writing-voice.md
+{{ end -}}

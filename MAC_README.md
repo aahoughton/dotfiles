@@ -76,9 +76,9 @@ pass 2 on (pass 1 runs before the machine has its name).
    - Any machine: history recorded before pass 2 was encrypted with a key atuin
      generated itself, which pass 2 replaces, so those records can no longer be
      decrypted. `atuin store purge` deletes them.
-8. **Server only:** Local LLM. `~/.config/llama/`, `~/.pi/`, the API key (from
-   1Password item `llama-api-key`) and the `local.llama-agent` LaunchAgent
-   arrive with pass 2. The weights do not.
+8. **Server only:** Local LLM. `~/.config/llama/`, pi's model config in
+   `~/.pi/agent/`, the API key (from 1Password item `llama-api-key`) and the
+   `local.llama-agent` LaunchAgent arrive with pass 2. The weights do not.
    - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
    - The LaunchAgent runs `llama-agent.sh` (the server plus the step 9 tools)

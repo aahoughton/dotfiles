@@ -205,9 +205,15 @@ delete the appended block.
 
 ## Layout
 
-- `private_dot_claude/CLAUDE.md` — global Claude Code instructions, deployed to
-  `~/.claude/CLAUDE.md`. Edits made on a machine (including through `/memory`)
-  are overwritten by the next apply; `chezmoi re-add ~/.claude/CLAUDE.md` first.
+- `.chezmoitemplates/agents-global.md` — global agent instructions, shared by
+  Claude Code (`~/.claude/CLAUDE.md`), Codex (`~/.codex/AGENTS.md`), pi
+  (`~/.pi/agent/AGENTS.md`), and Antigravity (`~/.gemini/AGENTS.md`). Each target
+  is a template that includes the shared text; instructions for one agent go after
+  the include in that agent's template. The targets are generated, so edits made
+  on a machine (including through `/memory`) are overwritten by the next apply;
+  copy them into the template first.
+- `dot_agents/private_writing-voice.md.tmpl` — writing-voice guide from 1Password,
+  deployed to `~/.agents/writing-voice.md`, where the shared instructions point.
 - `private_dot_claude/skills/` — Claude Code skills, deployed to `~/.claude/skills/`:
   `arch-review` (whole-repo structural audit), `branch-review` (pre-merge checks
   that complement `/code-review`), `pare-docs` (cuts bloat from prose docs).

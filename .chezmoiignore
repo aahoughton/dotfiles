@@ -15,11 +15,12 @@ scripts/
 
 {{/* Server-only pieces; `server` is set in .chezmoidata/server.yaml. The LLM
      stack runs on the server only: .pi's provider is a llama-server on
-     127.0.0.1. */}}
+     127.0.0.1. pi's AGENTS.md is not listed; it goes to every machine. */}}
 {{ if ne .chezmoi.hostname .server }}
 .config/atuin/docker-compose.yaml
 .config/llama
-.pi
+.pi/agent/models.json
+.pi/agent/settings.json
 Library/LaunchAgents/local.llama-agent.plist
 .ssh/authorized_keys
 {{ end }}
@@ -51,7 +52,7 @@ Library/LaunchAgents/local.llama-agent.plist
 .ssh/server_ed25519
 .ssh/github_ed25519
 .ssh/authorized_keys
-.claude/writing-voice.md
+.agents/writing-voice.md
 .aws/config
 .config/llama/api-key
 .local/share/atuin/key
