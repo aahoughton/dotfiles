@@ -8,9 +8,8 @@ description: >
   phrases like "review the architecture", "audit this codebase", "what's wrong
   with this repo", "assess the design", or "what would be hard to change here".
   Reviews the whole repo, not a diff; for reviewing the changes on a branch
-  before merging, use branch-review instead. Spawns three parallel specialist
-  agents and returns a single prioritized issue list. Pass a subdirectory to
-  limit the review to it on large repos.
+  before merging, use branch-review instead. Returns a single prioritized issue
+  list. Pass a subdirectory to limit the review to it on large repos.
 ---
 
 # Architectural Review
@@ -21,9 +20,9 @@ a single prioritized issue list.
 
 ## Scope
 
-If $ARGUMENTS names a directory, review only that subtree; orientation still
-reads the repo root for context. Otherwise review the whole repo. Pass the scope
-to every agent.
+If the invocation names a directory ($ARGUMENTS), review only that subtree;
+orientation still reads the repo root for context. Otherwise review the whole
+repo. Pass the scope to every agent.
 
 ## Orientation (do this first)
 
@@ -52,6 +51,9 @@ Agents:
 - `agents/design.md`: data models, abstractions, naming, structural patterns
 
 Read those files before dispatching so you can give agents accurate framing.
+
+If you cannot spawn agents, work through the three mandates yourself, one after
+another, and keep each pass's findings separate until synthesis.
 
 ## Synthesis
 

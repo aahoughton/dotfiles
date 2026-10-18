@@ -8,20 +8,20 @@ description: >
   changes, or wants the project's own checks run against the branch. Triggers on
   phrases like "anything else before I merge", "who needs to review this", "run
   the checks on this branch", or "am I clear to merge". Does NOT judge
-  correctness or code quality; /code-review does that, and /arch-review audits
-  whole-repo structure.
+  correctness or code quality; a code review (in Claude Code, /code-review) does
+  that, and the arch-review skill audits whole-repo structure.
 ---
 
 # Branch Pre-Merge Checks
 
-This skill is **strictly additive on top of `/code-review`**. That built-in already
-reads the diff, judges correctness and quality, and verifies its findings before
-reporting. Do not redo any of it.
+This skill is **strictly additive on top of a code review** (in Claude Code, the
+built-in `/code-review`). That review already reads the diff, judges correctness
+and quality, and verifies its findings before reporting. Do not redo any of it.
 
 **Explicit non-goals.** Do not look for bugs, logic errors, or security issues. Do
 not assess naming, style, or whether the code follows surrounding conventions. Do
 not evaluate test quality. If you notice something in one of those categories, do
-not report it here; say once, at the end, that `/code-review` would cover it.
+not report it here; say once, at the end, that a code review would cover it.
 
 What this skill does is the mechanical, checkable work that a reviewing model
 skips: running the project's own tooling and consulting the repo's own metadata.
@@ -42,12 +42,12 @@ If the diff is empty, say so and stop; there is nothing to check.
 ## Checks
 
 **1. Repo-specific review guidance.** Look for `.github/copilot-instructions.md`,
-`.github/copilot-review-hints.md`, `.github/review-hints.md`, `CLAUDE.md`, and
-`.claude/CLAUDE.md`. Read any that exist. Report only the rules that are *relevant
-to the changed paths*, and check the diff against those rules specifically. This
-is guidance a generic review would not know about. Quote the rule when you flag a
-violation. If no such files exist, say so in one line; it is useful to know none
-are configured.
+`.github/copilot-review-hints.md`, `.github/review-hints.md`, `AGENTS.md`,
+`CLAUDE.md`, and `.claude/CLAUDE.md`. Read any that exist. Report only the rules
+that are *relevant to the changed paths*, and check the diff against those rules
+specifically. This is guidance a generic review would not know about. Quote the
+rule when you flag a violation. If no such files exist, say so in one line; it is
+useful to know none are configured.
 
 **2. CODEOWNERS.** If `CODEOWNERS` exists (repo root, `.github/`, or `docs/`), map
 each changed path to its owning entries and list the distinct owners whose approval
@@ -93,5 +93,5 @@ came back clean. Keep it compact: this is a checklist result, not a review.
 [TODO/FIXME/HACK added in this diff, or omit this section.]
 ```
 
-End by recommending `/code-review` unless it has already run on this branch in
-this session. These checks do not substitute for it.
+End by recommending a code review (in Claude Code, `/code-review`) unless one has
+already run on this branch in this session. These checks do not substitute for it.
