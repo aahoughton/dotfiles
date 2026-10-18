@@ -214,9 +214,12 @@ delete the appended block.
   copy them into the template first.
 - `dot_agents/private_writing-voice.md.tmpl` — writing-voice guide from 1Password,
   deployed to `~/.agents/writing-voice.md`, where the shared instructions point.
-- `private_dot_claude/skills/` — Claude Code skills, deployed to `~/.claude/skills/`:
-  `arch-review` (whole-repo structural audit), `branch-review` (pre-merge checks
-  that complement `/code-review`), `pare-docs` (cuts bloat from prose docs).
+- `dot_agents/skills/` — agent skills, deployed to `~/.agents/skills/`, where Codex
+  reads them: `arch-review` (whole-repo structural audit), `branch-review`
+  (pre-merge checks that complement a code review), `pare-docs` (cuts bloat from
+  prose docs). Claude Code, pi, and Antigravity read other directories, so each
+  skill has a symlink in `~/.claude/skills/`, `~/.pi/agent/skills/`, and
+  `~/.gemini/config/skills/`. A new skill needs all three links.
 - `private_dot_claude/agents/` — Claude Code subagents, deployed to
   `~/.claude/agents/`: `diff-reviewer` (reviews a staged diff or sha range from
   fresh context, independent of whoever wrote it).
