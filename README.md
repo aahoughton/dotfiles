@@ -216,8 +216,8 @@ delete the appended block.
   deployed to `~/.agents/writing-voice.md`, where the shared instructions point.
 - `dot_agents/skills/` — agent skills, deployed to `~/.agents/skills/`, where Codex
   reads them: `arch-review` (whole-repo structural audit), `branch-review`
-  (pre-merge checks that complement a code review), `pare-docs` (cuts bloat from
-  prose docs). Claude Code, pi, and Antigravity read other directories, so each
+  (pre-merge checks that complement a code review), `herdr` (finds the right Herdr
+  manual), `pare-docs` (cuts bloat from prose docs). Claude Code, pi, and Antigravity read other directories, so each
   skill has a symlink in `~/.claude/skills/`, `~/.pi/agent/skills/`, and
   `~/.gemini/config/skills/`. A new skill needs all three links.
 - `private_dot_claude/agents/` — Claude Code subagents, deployed to
