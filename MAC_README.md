@@ -79,6 +79,8 @@ pass 2 on (pass 1 runs before the machine has its name).
 8. **Server only:** Local LLM. `~/.config/llama/`, pi's model config in
    `~/.pi/agent/`, the API key (from 1Password item `llama-api-key`) and the
    `local.llama-agent` LaunchAgent arrive with pass 2. The weights do not.
+   - Every other machine also gets pi's provider, pointed at this server through
+     the tailnet exposure below, and the API key.
    - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
    - The LaunchAgent runs `llama-agent.sh` (the server plus the step 9 tools)

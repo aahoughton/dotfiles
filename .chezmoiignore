@@ -13,12 +13,17 @@ scripts/
 .pi/agent/sessions
 
 {{/* Server-only pieces; `server` is set in .chezmoidata/server.yaml. The LLM
-     stack runs on the server only: .pi's provider is a llama-server on
-     127.0.0.1. pi's AGENTS.md is not listed; it goes to every machine. */}}
+     stack runs on the server only. Every machine gets pi's AGENTS.md, pi's
+     provider (models.json) and the API key, so clients can use the server's
+     llama-server over the tailnet. */}}
 {{ if ne .chezmoi.hostname .server }}
 .config/atuin/docker-compose.yaml
-.config/llama
-.pi/agent/models.json
+.config/llama/llama-serve.sh
+.config/llama/llama-agent.sh
+.config/llama/restore-models.sh
+.config/llama/mcp-servers.json
+.config/llama/models.lock.yaml
+.config/llama/searxng
 .pi/agent/settings.json
 Library/LaunchAgents/local.llama-agent.plist
 .ssh/authorized_keys
