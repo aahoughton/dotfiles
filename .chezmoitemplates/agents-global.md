@@ -92,6 +92,14 @@ Install global CLIs with `mise use -g <tool>` (`npm:<pkg>` for Node CLIs), never
 `npm install -g`. An `npm -g` package belongs to one Node version and disappears in
 projects that pin another.
 
+### Herdr
+
+If `$HC_TERMINAL_ID` is set, this terminal runs under herdr-core. `hc` can read or
+message my other terminals, start agents I can watch, and run commands on other
+machines. Run `hc --skill` before using it, and only when the task calls for one of
+those. Never send input to a terminal you did not start unless I ask.
+`HERDR_ENV=1` means the older TUI instead: `herdr --skill`.
+
 ## Testing
 
 - Test behavior, not implementation
