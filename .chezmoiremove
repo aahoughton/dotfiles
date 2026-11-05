@@ -14,3 +14,7 @@
 {{ if stat (joinPath .chezmoi.homeDir ".agents/writing-voice.md") -}}
 .claude/writing-voice.md
 {{ end -}}
+{{/* The Ghostty background tint is gone. Its machine-local host table only
+     called a helper the tint script defined, so it goes too. */}}
+.config/fish/conf.d/ghostty_tint.fish
+.config/fish/conf.d/ghostty_tint.local.fish
