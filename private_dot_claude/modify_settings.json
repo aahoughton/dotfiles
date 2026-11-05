@@ -1,6 +1,6 @@
 #!/bin/sh
 # Claude Code rewrites ~/.claude/settings.json at runtime (toggling plugins,
-# changing theme/model via /config), so chezmoi cannot own the whole file
+# changing the model via /config), so chezmoi cannot own the whole file
 # without fighting it for every edit.
 #
 # As a modify_ script this receives the current file on stdin and writes the
@@ -30,6 +30,7 @@ if ! command -v jq >/dev/null 2>&1; then
     "command": "~/.claude/statusline-command.sh"
   },
   "tui": "fullscreen",
+  "theme": "auto",
   "skipAutoPermissionPrompt": true,
   "agentPushNotifEnabled": true
 }
@@ -64,9 +65,13 @@ fi
 #
 # Everything else under .hooks is passed through untouched, so a hook
 # added later through /hooks survives.
+#
+# theme "auto" matches the terminal's background, so one value serves a light
+# terminal and a dark one. A theme picked in /theme lasts until the next apply.
 printf '%s' "$input" | jq '
       .statusLine = {"type": "command", "command": "~/.claude/statusline-command.sh"}
     | .tui = "fullscreen"
+    | .theme = "auto"
     | .skipAutoPermissionPrompt = true
     | .agentPushNotifEnabled = true
     | (if (.hooks.PreToolUse | type) == "array" then
