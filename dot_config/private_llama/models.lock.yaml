@@ -11,9 +11,14 @@
 active_root: ~/Models/LLM
 archive_root: ~/Dropbox/Media/Local-LLM-Archive
 
-# Minimum llama.cpp build. Earlier builds lack the qwen35 architecture and will
-# refuse to load the model with an "unknown model architecture" error.
-min_llama_cpp: "0.4.0"
+# Minimum llama.cpp build: the oldest one the primary has been run on, with
+# MTP, through llama-serve.sh. Older builds may lack its architecture
+# (qwen35moe) and refuse to load it with an "unknown model architecture" error.
+min_llama_cpp: "0.7.0"
+
+# Each model carries its own sampling defaults, from its model card.
+# llama-serve.sh passes the primary's as server defaults; a request that sets
+# its own sampling parameters overrides them.
 
 models:
   - name: qwen3.8-27b
@@ -29,6 +34,10 @@ models:
     upstream_revision: 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
     license: Apache-2.0
     arch: qwen35
+    sampling:
+      temperature: 1.0
+      top_p: 0.95
+      top_k: 20
     files:
       - name: Qwen3.8-27B-Q8_0.gguf
         role: weights
@@ -41,7 +50,7 @@ models:
         sha256: cbb841a9ee0636b2ec172f5bb8df2ea8dfeb01e90fe7c6126581d662a0b4e43e
 
   - name: swift-qwen3.8-27b
-    role: primary
+    role: candidate
     # Third-party fine-tune of Qwen/Qwen3.8-27B, trained to emit fewer
     # reasoning tokens. Carries the same MTP head (blk.64.nextn.*) as the base
     # model, so llama-serve.sh's speculative-decoding flags apply unchanged.
@@ -56,6 +65,10 @@ models:
     # Qwen/Qwen3.8-27B.
     license: LicenseRef-Swift-Open-License-1.0
     arch: qwen35
+    sampling:
+      temperature: 1.0
+      top_p: 0.95
+      top_k: 20
     files:
       - name: Swift-Qwen3.8-27B-Q8_0.gguf
         role: weights
@@ -65,3 +78,33 @@ models:
         role: mmproj
         bytes: 927606976
         sha256: daa1116c9422fa390cc8688495da0e91781f92841dfc3b31a378ff252571745a
+
+  - name: ornith-1.5-35b-a3b
+    role: primary
+    # Mixture of experts, 35B total and about 3B active per token, so it
+    # decodes several times faster than the dense 27B models above. Carries
+    # one MTP layer (blk.40.nextn.*), so the speculative-decoding flags apply.
+    repo: ornith-ai/Ornith-1.5-35B-A3B-GGUF
+    revision: 12393612fd4f730ff5aadc23e9b8f9648aa49ceb
+    revision_short: 12393612fd4f
+    quant: Q8_0
+    upstream_repo: ornith-ai/Ornith-1.5-35B-A3B
+    # The GGUF repo does not record which upstream revision it was converted
+    # from. This is the upstream revision current when the GGUFs were published.
+    upstream_revision: 10fbf86fed7ecee4a061f8b499a618f46001cac1
+    license: MIT
+    arch: qwen35moe
+    sampling:
+      temperature: 0.6
+      top_p: 0.95
+      top_k: 20
+    files:
+      - name: Ornith-1.5-35B-Q8_0.gguf
+        role: weights
+        bytes: 37802149280
+        sha256: de46c4baf4b4dd85ea438bb0f757f21c38841a353506579979bba114311658c3
+      - name: mmproj-Ornith-1.5-35B-BF16.gguf
+        # The repo publishes the projector only in BF16.
+        role: mmproj
+        bytes: 902822240
+        sha256: 1921a36a85aee56cd2abd27f46701802c9d85a33474792e600df6c3b282a135d
