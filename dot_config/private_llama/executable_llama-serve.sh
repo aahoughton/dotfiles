@@ -86,18 +86,19 @@ done
 #       values that looked plausible. The model warns about this at load time.
 #
 #   --parallel 1            one slot owns the whole context window.
-#       The KV cache is unified: with the default --parallel 4, all four slots
-#       share a single --ctx-size pool rather than getting one each. Two agents
-#       running at once then silently contend for the same tokens, which shows
-#       up as unexplained truncation. With one slot, concurrent requests queue
-#       instead, which fails loudly and predictably.
+#       Left at its default, llama-server picks 4 slots and unifies the KV
+#       cache, so all four share a single --ctx-size pool rather than getting
+#       one each. Two agents running at once then silently contend for the same
+#       tokens, which shows up as unexplained truncation. With one slot,
+#       concurrent requests queue instead, which fails loudly and predictably.
 #
 #   --spec-type draft-mtp   speculative decoding off the model's own MTP head.
 #       The Q8_0 weights carry an extra block (blk.64.nextn.*, keyed by
 #       qwen35.nextn_predict_layers), so there is no separate draft model to
 #       download or pin. Measured on a fixed 900-token completion at
 #       temperature 0: 40.9s without, 26.7s with, for 22.0 -> 33.7 t/s. Output
-#       was byte-identical with and without, as speculative decoding should be.
+#       is not guaranteed identical with and without: on quantized weights the
+#       MTP path can change greedy output (llama.cpp issue #25618).
 #
 #   --spec-draft-n-max 3    draft budget per step. This is also llama.cpp's
 #       current default; it is passed explicitly so a future change to that
@@ -144,5 +145,5 @@ if [ "$DRY_RUN" = true ]; then
     exit 0
 fi
 
-echo "starting $alias_name on 0.0.0.0:$PORT (ctx $CTX)" >&2
+echo "starting $alias_name on 127.0.0.1:$PORT (ctx $CTX)" >&2
 exec "${cmd[@]}"
