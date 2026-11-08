@@ -116,12 +116,12 @@ done
 #       guaranteed identical with and without: on quantized weights the MTP
 #       path can change greedy output (llama.cpp issue #25618).
 #
-#   --spec-draft-n-max 3    draft budget per step. This is also llama.cpp's
-#       current default; it is passed explicitly so a future change to that
-#       default does not silently retune this. Tuned on Swift Qwen, where
-#       larger budgets were slower overall: n=3 26.7s (acceptance 0.68), n=4
-#       31.0s (0.60), n=5 31.3s (0.52), n=6 36.2s (0.47). Not retuned for
-#       Ornith, which accepts 0.55 of drafted tokens at n=3.
+#   --spec-draft-n-max 2    draft budget per step, tuned for Ornith. Mean tg
+#       over code, prose and outline prompts (1024 tokens, thinking off, 3
+#       runs each): no MTP 96 t/s, n=1 117 (acceptance 0.76), n=2 121 (0.62),
+#       n=3 115 (0.50), n=4 111, n=5 102, n=6 94. Code alone is flat from n=2
+#       to n=4 (132-135); prose and outlines fall off past n=2. Swift Qwen's
+#       best was n=3. Re-tune when the primary changes.
 #
 # --cache-reuse is deliberately absent: llama-server disables it when an mmproj
 # is loaded ("cache_reuse is not supported by multimodal"), so passing it only
@@ -153,7 +153,7 @@ cmd=(
     --image-min-tokens 1024
     --jinja
     --spec-type draft-mtp
-    --spec-draft-n-max 3
+    --spec-draft-n-max 2
 )
 
 if [ ${#EXTRA[@]} -gt 0 ]; then
