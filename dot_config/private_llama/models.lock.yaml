@@ -21,48 +21,21 @@ min_llama_cpp: "0.7.0"
 # its own sampling parameters overrides them.
 
 models:
-  - name: qwen3.8-27b
-    role: candidate
-    # Kept as the fallback to swap back to. llama-serve.sh only ever loads
-    # role: primary.
-    repo: unsloth/Qwen3.8-27B-GGUF
-    revision: 4ca720788d1e01f1bff70c033e0d0028fd02e502
-    # Short revision is the on-disk directory name under <root>/<repo>/.
-    revision_short: 4ca720788d1e
-    quant: Q8_0
-    upstream_repo: Qwen/Qwen3.8-27B
-    upstream_revision: 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
-    license: Apache-2.0
-    arch: qwen35
-    sampling:
-      temperature: 1.0
-      top_p: 0.95
-      top_k: 20
-    files:
-      - name: Qwen3.8-27B-Q8_0.gguf
-        role: weights
-        bytes: 29047086048
-        sha256: a680f44a06920e5d689774823782006aa3acc8db95750323373b24139b67e348
-      - name: mmproj-F16.gguf
-        # F16 rather than BF16: better-exercised path on Metal.
-        role: mmproj
-        bytes: 927607488
-        sha256: cbb841a9ee0636b2ec172f5bb8df2ea8dfeb01e90fe7c6126581d662a0b4e43e
-
   - name: swift-qwen3.8-27b
     role: candidate
-    # Third-party fine-tune of Qwen/Qwen3.8-27B, trained to emit fewer
-    # reasoning tokens. Carries the same MTP head (blk.64.nextn.*) as the base
-    # model, so llama-serve.sh's speculative-decoding flags apply unchanged.
+    # Kept as the fallback to swap back to. llama-serve.sh only ever loads
+    # role: primary. Third-party fine-tune of Qwen/Qwen3.8-27B, trained to
+    # emit fewer reasoning tokens. Carries an MTP head (blk.64.nextn.*), so
+    # llama-serve.sh's speculative-decoding flags apply unchanged.
     repo: ukisai/Swift-Qwen3.8-27B-GGUF
     revision: b12fc8f44af7bdf31a3c3309891acb345d3106a2
+    # Short revision is the on-disk directory name under <root>/<repo>/.
     revision_short: b12fc8f44af7
     quant: Q8_0
     upstream_repo: ukisai/Swift-Qwen3.8-27b
     upstream_revision: 1b30aaaf753fe5c1cb51ada2ea0367a53445359c
-    # Custom terms where the primary is Apache-2.0: free below US$1M annual
-    # revenue, paid license above it. The base model underneath is still
-    # Qwen/Qwen3.8-27B.
+    # Custom terms: free below US$1M annual revenue, paid license above it.
+    # The base model underneath, Qwen/Qwen3.8-27B, is Apache-2.0.
     license: LicenseRef-Swift-Open-License-1.0
     arch: qwen35
     sampling:
@@ -82,7 +55,7 @@ models:
   - name: ornith-1.5-35b-a3b
     role: primary
     # Mixture of experts, 35B total and about 3B active per token, so it
-    # decodes several times faster than the dense 27B models above. Carries
+    # decodes several times faster than the dense 27B model above. Carries
     # one MTP layer (blk.40.nextn.*), so the speculative-decoding flags apply.
     repo: ornith-ai/Ornith-1.5-35B-A3B-GGUF
     revision: 12393612fd4f730ff5aadc23e9b8f9648aa49ceb
