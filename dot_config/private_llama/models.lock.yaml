@@ -11,22 +11,33 @@
 active_root: ~/Models/LLM
 archive_root: ~/Dropbox/Media/Local-LLM-Archive
 
-# Minimum llama.cpp build: the oldest one the primary has been run on, with
-# MTP, through llama-serve.sh. Older builds may lack its architecture
-# (qwen35moe) and refuse to load it with an "unknown model architecture" error.
+# Minimum llama.cpp build: the oldest one the served models have been run on,
+# with MTP, through llama-serve.sh. Older builds may lack their architectures
+# (qwen35moe) and refuse to load them with an "unknown model architecture"
+# error.
 min_llama_cpp: "0.7.0"
 
-# Each model carries its own sampling defaults, from its model card.
-# llama-serve.sh passes the primary's as server defaults; a request that sets
-# its own sampling parameters overrides them.
+# role: which server runs the model. `llama-serve.sh -r <role>` loads the one
+# model with that role. chat is the general-purpose server with web search
+# (llama-agent.sh, the web UI); code backs pi. Any other role (candidate) is
+# kept on disk and in the archive but not served.
+#
+# sampling: defaults from the model card, passed as server defaults; a request
+# that sets its own sampling parameters overrides them.
+#
+# serve: per-server settings, read by llama-serve.sh and by pi's models.json
+# template, so a model's port, context and alias are defined only here.
+#   port              loopback port; tailscale serve exposes the same port
+#   ctx               context window, also pi's contextWindow
+#   spec_draft_n_max  MTP draft budget, tuned per model (see llama-serve.sh)
+#   reasoning         optional; passed as --reasoning (on, off, auto). A
+#                     request can still turn thinking on or off itself.
 
 models:
   - name: swift-qwen3.8-27b
-    role: candidate
-    # Kept as the fallback to swap back to. llama-serve.sh only ever loads
-    # role: primary. Third-party fine-tune of Qwen/Qwen3.8-27B, trained to
-    # emit fewer reasoning tokens. Carries an MTP head (blk.64.nextn.*), so
-    # llama-serve.sh's speculative-decoding flags apply unchanged.
+    role: code
+    # Third-party fine-tune of Qwen/Qwen3.8-27B, trained to emit fewer
+    # reasoning tokens. Carries an MTP head (blk.64.nextn.*).
     repo: ukisai/Swift-Qwen3.8-27B-GGUF
     revision: b12fc8f44af7bdf31a3c3309891acb345d3106a2
     # Short revision is the on-disk directory name under <root>/<repo>/.
@@ -42,6 +53,14 @@ models:
       temperature: 1.0
       top_p: 0.95
       top_k: 20
+    serve:
+      port: 8081
+      # 260 KiB/token of KV at f16 (65 layers, 4 kv heads, k/v length 256):
+      # 32.5 GiB at 131072 on top of 28 GB of weights.
+      ctx: 131072
+      # Tuned: n=3 26.7s on a 900-token completion (acceptance 0.68), n=4
+      # 31.0s, n=5 31.3s, n=6 36.2s.
+      spec_draft_n_max: 3
     files:
       - name: Swift-Qwen3.8-27B-Q8_0.gguf
         role: weights
@@ -53,7 +72,7 @@ models:
         sha256: daa1116c9422fa390cc8688495da0e91781f92841dfc3b31a378ff252571745a
 
   - name: ornith-1.5-35b-a3b
-    role: primary
+    role: chat
     # Mixture of experts, 35B total and about 3B active per token, so it
     # decodes several times faster than the dense 27B model above. Carries
     # one MTP layer (blk.40.nextn.*), so the speculative-decoding flags apply.
@@ -71,6 +90,15 @@ models:
       temperature: 0.6
       top_p: 0.95
       top_k: 20
+    serve:
+      port: 8080
+      # Trained context. KV is 20 KiB/token at f16 (see llama-serve.sh).
+      ctx: 262144
+      spec_draft_n_max: 2
+      # Chat answers were as accurate and 2.5x faster with thinking off, and
+      # thinking on looped on a false-premise question. A request turns it
+      # back on with chat_template_kwargs.enable_thinking.
+      reasoning: "off"
     files:
       - name: Ornith-1.5-35B-Q8_0.gguf
         role: weights

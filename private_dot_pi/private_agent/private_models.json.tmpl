@@ -1,33 +1,32 @@
-{
-  "providers": {
-    "llama-local": {
-      "baseUrl": "http://{{ if ne .chezmoi.hostname .server }}{{ .server }}{{ else }}127.0.0.1{{ end }}:8080/v1",
-      "api": "openai-completions",
-      "apiKey": "!cat ~/.config/llama/api-key",
-      "authHeader": true,
-      "compat": {
-        "supportsDeveloperRole": false,
-        "supportsReasoningEffort": false
-      },
-      "models": [
-        {
-          "id": "ornith-1.5-35b-a3b",
-          "name": "Ornith 1.5 35B-A3B Q8_0 (behemoth, local)",
-          "reasoning": true,
-          "input": [
-            "text",
-            "image"
-          ],
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cacheRead": 0,
-            "cacheWrite": 0
-          },
-          "contextWindow": 262144,
-          "maxTokens": 40960
-        }
-      ]
-    }
-  }
-}
+{{- /* One provider per served model, built from the lock file so the port,
+       context window and model id (llama-server's --alias) cannot drift from
+       what llama-serve.sh serves. The lock file is read from the source
+       directory, so this renders on clients that do not install it. */ -}}
+{{- $lock := include "dot_config/private_llama/models.lock.yaml" | fromYaml -}}
+{{- $host := "127.0.0.1" -}}
+{{- if ne .chezmoi.hostname .server }}{{ $host = .server }}{{ end -}}
+{{- $providers := dict -}}
+{{- range $lock.models -}}
+{{-   if or (eq .role "chat") (eq .role "code") -}}
+{{-     $model := dict
+          "id" .name
+          "name" (printf "%s (%s, %s)" .name .role $.server)
+          "reasoning" true
+          "input" (list "text" "image")
+          "cost" (dict "input" 0 "output" 0 "cacheRead" 0 "cacheWrite" 0)
+          "contextWindow" .serve.ctx
+          "maxTokens" 40960 -}}
+{{-     $provider := dict
+          "baseUrl" (printf "http://%s:%v/v1" $host .serve.port)
+          "api" "openai-completions"
+          "apiKey" "!cat ~/.config/llama/api-key"
+          "authHeader" true
+          "compat" (dict
+            "supportsDeveloperRole" false
+            "supportsReasoningEffort" false
+            "thinkingFormat" "qwen-chat-template")
+          "models" (list $model) -}}
+{{-     $_ := set $providers (printf "llama-%s" .role) $provider -}}
+{{-   end -}}
+{{- end -}}
+{{ dict "providers" $providers | toPrettyJson }}

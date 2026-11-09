@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
 #
-# llama-serve.sh -- start llama-server for the primary local model.
+# llama-serve.sh -- start llama-server for one of the served local models.
 #
-# Reads ~/.config/llama/models.lock.yaml for the model paths and verifies the
-# API key file exists before binding. Runs in the foreground; use your usual
-# process supervisor if you want it detached.
+# Reads ~/.config/llama/models.lock.yaml for the model with the given role:
+# its paths, sampling, port, context and MTP settings. Verifies the API key
+# file exists before binding. Runs in the foreground; use your usual process
+# supervisor if you want it detached.
 #
 # Usage:
-#   llama-serve.sh [-p port] [-c ctx] [-n] [-- extra llama-server flags...]
+#   llama-serve.sh -r role [-p port] [-c ctx] [-n] [-- extra llama-server flags...]
+#     -r  chat or code: the lock file's role for the model to serve
+#     -p  override the model's serve.port
+#     -c  override the model's serve.ctx
 #     -n  print the command that would run, then exit
 #
 # Anything after `--` is appended to the llama-server command verbatim. That is
 # how llama-agent.sh layers tool flags on top without duplicating this file.
 #
 # Binding: this listens on loopback only. Tailnet reachability comes from
-# `tailscale serve`, which proxies http://behemoth:8080 to 127.0.0.1:8080, so
-# tailnet devices get in and the LAN does not. See MAC_README.md for that setup.
+# `tailscale serve`, which proxies http://behemoth:<port> to 127.0.0.1:<port>,
+# so tailnet devices get in and the LAN does not. See MAC_README.md for that
+# setup.
 #
 # The API key is still required, as defence in depth rather than as the only
 # control: anything that can reach loopback (any local process, any SSH session)
@@ -26,18 +31,22 @@ set -euo pipefail
 
 LOCK="$HOME/.config/llama/models.lock.yaml"
 KEY_FILE="$HOME/.config/llama/api-key"
-PORT=8080
-CTX=262144
+ROLE=
+PORT=
+CTX=
 DRY_RUN=false
+USAGE="usage: llama-serve.sh -r role [-p port] [-c ctx] [-n] [-- llama-server flags]"
 
-while getopts "p:c:n" opt; do
+while getopts "r:p:c:n" opt; do
     case $opt in
+        r) ROLE="$OPTARG" ;;
         p) PORT="$OPTARG" ;;
         c) CTX="$OPTARG" ;;
         n) DRY_RUN=true ;;
-        *) echo "Usage: llama-serve.sh [-p port] [-c ctx] [-n]" >&2; exit 1 ;;
+        *) echo "$USAGE" >&2; exit 1 ;;
     esac
 done
+[ -n "$ROLE" ] || { echo "$USAGE" >&2; exit 1; }
 shift $((OPTIND - 1))
 EXTRA=("$@")
 
@@ -62,37 +71,44 @@ perms=$(stat -f '%Lp' "$KEY_FILE")
 active_root=$(yq -r '.active_root' "$LOCK")
 active_root="${active_root/#\~/$HOME}"
 
-read -r repo rev quant alias_name < <(
-    yq -r '.models[] | select(.role == "primary")
-           | [.repo, .revision_short, .quant, .name] | join(" ")' "$LOCK"
-)
-[ -n "${repo:-}" ] || { echo "error: no model with role 'primary' in $LOCK" >&2; exit 1; }
+n=$(ROLE="$ROLE" yq '[.models[] | select(.role == strenv(ROLE))] | length' "$LOCK")
+[ "$n" = 1 ] || { echo "error: $LOCK has $n models with role '$ROLE', expected 1" >&2; exit 1; }
+
+# One yq call per field: a missing field prints "null", which the checks below
+# reject, instead of shifting the remaining fields as a space-joined read would.
+field() { ROLE="$ROLE" yq -r ".models[] | select(.role == strenv(ROLE)) | $1" "$LOCK"; }
+require() {
+    case $2 in
+        ''|null) echo "error: the '$ROLE' model in $LOCK needs $1" >&2; exit 1 ;;
+    esac
+}
+
+repo=$(field .repo);              require repo "$repo"
+rev=$(field .revision_short);     require revision_short "$rev"
+quant=$(field .quant);            require quant "$quant"
+alias_name=$(field .name);        require name "$alias_name"
+temp=$(field .sampling.temperature); require sampling.temperature "$temp"
+top_p=$(field .sampling.top_p);   require sampling.top_p "$top_p"
+top_k=$(field .sampling.top_k);   require sampling.top_k "$top_k"
+draft_n=$(field .serve.spec_draft_n_max); require serve.spec_draft_n_max "$draft_n"
+reasoning=$(field .serve.reasoning)
+if [ -z "$PORT" ]; then PORT=$(field .serve.port); require serve.port "$PORT"; fi
+if [ -z "$CTX" ]; then CTX=$(field .serve.ctx); require serve.ctx "$CTX"; fi
 
 model_dir="$active_root/$repo/$rev/$quant"
-weights="$model_dir/$(yq -r '.models[] | select(.role=="primary") | .files[] | select(.role=="weights") | .name' "$LOCK")"
-mmproj="$model_dir/$(yq -r '.models[] | select(.role=="primary") | .files[] | select(.role=="mmproj") | .name' "$LOCK")"
+weights="$model_dir/$(field '.files[] | select(.role == "weights") | .name')"
+mmproj="$model_dir/$(field '.files[] | select(.role == "mmproj") | .name')"
 
 for f in "$weights" "$mmproj"; do
     [ -f "$f" ] || { echo "error: missing $f (run restore-models.sh)" >&2; exit 1; }
 done
 
-read -r temp top_p top_k < <(
-    yq -r '.models[] | select(.role == "primary") | .sampling
-           | [.temperature, .top_p, .top_k] | join(" ")' "$LOCK"
-)
-for v in "${temp:-}" "${top_p:-}" "${top_k:-}"; do
-    case $v in
-        ''|null) echo "error: primary model in $LOCK needs sampling.temperature, .top_p and .top_k" >&2; exit 1 ;;
-    esac
-done
-
-# Flags verified against llama.cpp 0.9.0 (build 12110) with the Ornith 1.5
-# 35B-A3B Q8_0 primary. Notes that name Swift Qwen were measured on that
-# earlier primary (dense 27B, Q8_0).
+# Flags verified against llama.cpp 0.9.0 (build 12110) with Ornith 1.5
+# 35B-A3B Q8_0 (chat) and Swift Qwen3.8 27B Q8_0 (code).
 #   --n-gpu-layers 999      offload everything to Metal
 #   --flash-attn on         required for the cache-type settings below to pay off
 #   --jinja                 use the model's own chat template for tool calling
-#   --temp/--top-p/--top-k  the primary's sampling block from the lock file
+#   --temp/--top-p/--top-k  the model's sampling block from the lock file
 #   --image-min-tokens 1024 Qwen-VL needs at least this many tokens per image.
 #       Below it the vision path does not error, it confabulates: on Swift
 #       Qwen, a 1082x400 document page budgeted ~440 tokens produced entirely
@@ -116,12 +132,13 @@ done
 #       guaranteed identical with and without: on quantized weights the MTP
 #       path can change greedy output (llama.cpp issue #25618).
 #
-#   --spec-draft-n-max 2    draft budget per step, tuned for Ornith. Mean tg
-#       over code, prose and outline prompts (1024 tokens, thinking off, 3
-#       runs each): no MTP 96 t/s, n=1 117 (acceptance 0.76), n=2 121 (0.62),
-#       n=3 115 (0.50), n=4 111, n=5 102, n=6 94. Code alone is flat from n=2
-#       to n=4 (132-135); prose and outlines fall off past n=2. Swift Qwen's
-#       best was n=3. Re-tune when the primary changes.
+#   --spec-draft-n-max      draft budget per step, the model's
+#       serve.spec_draft_n_max. Re-tune for each model. Ornith, mean tg over
+#       code, prose and outline prompts (1024 tokens, thinking off, 3 runs
+#       each): no MTP 96 t/s, n=1 117 (acceptance 0.76), n=2 121 (0.62), n=3
+#       115 (0.50), n=4 111, n=5 102, n=6 94. Code alone is flat from n=2 to
+#       n=4 (132-135); prose and outlines fall off past n=2. Swift Qwen's
+#       numbers are in the lock file.
 #
 # --cache-reuse is deliberately absent: llama-server disables it when an mmproj
 # is loaded ("cache_reuse is not supported by multimodal"), so passing it only
@@ -130,12 +147,17 @@ done
 # so the whole rebuilt context is re-prefilled (Ornith: ~1300 t/s at 58k
 # tokens, ~550 t/s at 206k).
 #
-# Context sizing: 262144 is Ornith's trained context. Only 10 of its 40 layers
-# use full attention (the rest keep a fixed-size recurrent state), with 2 kv
-# heads and k/v length 256, so KV costs 20 KiB/token at f16: 5 GiB at 262144,
-# on top of 38 GB of weights. The whole server measured 48 GiB RSS. Measured
-# tg on a 900-token completion: 119 t/s at depth 0, 97 at 28k, 80 at 58k, 47
-# at 206k, with no cliff.
+#   --reasoning             the model's serve.reasoning, when set. Only the
+#       server default: a request's chat_template_kwargs.enable_thinking
+#       overrides it in either direction.
+#
+# Context sizing comes from serve.ctx. Ornith's 262144 is its trained context.
+# Only 10 of its 40 layers use full attention (the rest keep a fixed-size
+# recurrent state), with 2 kv heads and k/v length 256, so KV costs 20
+# KiB/token at f16: 5 GiB at 262144, on top of 38 GB of weights. The whole
+# server measured 48 GiB RSS. Measured tg on a 900-token completion: 119 t/s at
+# depth 0, 97 at 28k, 80 at 58k, 47 at 206k, with no cliff. Swift Qwen's
+# sizing is in the lock file.
 cmd=(
     llama-server
     --model "$weights"
@@ -153,8 +175,12 @@ cmd=(
     --image-min-tokens 1024
     --jinja
     --spec-type draft-mtp
-    --spec-draft-n-max 2
+    --spec-draft-n-max "$draft_n"
 )
+
+if [ -n "$reasoning" ] && [ "$reasoning" != null ]; then
+    cmd+=(--reasoning "$reasoning")
+fi
 
 if [ ${#EXTRA[@]} -gt 0 ]; then
     cmd+=("${EXTRA[@]}")

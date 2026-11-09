@@ -15,7 +15,8 @@ scripts/
 {{/* Server-only pieces; `server` is set in .chezmoidata/server.yaml. The LLM
      stack runs on the server only. Every machine gets pi's AGENTS.md, pi's
      provider (models.json) and the API key, so clients can use the server's
-     llama-server over the tailnet. */}}
+     llama-servers over the tailnet. pi's mcp.json is server-only: its search
+     tools need the server's SearXNG. */}}
 {{ if ne .chezmoi.hostname .server }}
 .config/atuin/docker-compose.yaml
 .config/llama/llama-serve.sh
@@ -25,7 +26,9 @@ scripts/
 .config/llama/models.lock.yaml
 .config/llama/searxng
 .pi/agent/settings.json
+.pi/agent/mcp.json
 Library/LaunchAgents/local.llama-agent.plist
+Library/LaunchAgents/local.llama-code.plist
 .ssh/authorized_keys
 {{ end }}
 
@@ -64,4 +67,5 @@ Library/LaunchAgents/local.llama-agent.plist
        here with the API key; otherwise a login before the key exists starts
        a server that fails every 30s. */}}
 Library/LaunchAgents/local.llama-agent.plist
+Library/LaunchAgents/local.llama-code.plist
 {{ end }}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps the code model's server (llama-serve.sh -r code, for pi) running.
+  Loaded by run_onchange_after_load-llama-agent.sh. No MCP tools: pi runs
+  its own MCP client (~/.pi/agent/mcp.json).
+
+  launchd expands neither ~ nor $HOME, hence the template. PATH needs
+  /opt/homebrew/bin for llama-server and yq.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>local.llama-code</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ .chezmoi.homeDir }}/.config/llama/llama-serve.sh</string>
+        <string>-r</string>
+        <string>code</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>StandardOutPath</key>
+    <string>{{ .chezmoi.homeDir }}/Library/Logs/llama-code.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{ .chezmoi.homeDir }}/Library/Logs/llama-code.log</string>
+</dict>
+</plist>

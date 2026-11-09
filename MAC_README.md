@@ -76,31 +76,40 @@ pass 2 on (pass 1 runs before the machine has its name).
    - Any machine: history recorded before pass 2 was encrypted with a key atuin
      generated itself, which pass 2 replaces, so those records can no longer be
      decrypted. `atuin store purge` deletes them.
-8. **Server only:** Local LLM. `~/.config/llama/`, pi's model config in
-   `~/.pi/agent/`, the API key (from 1Password item `llama-api-key`) and the
-   `local.llama-agent` LaunchAgent arrive with pass 2. The weights do not.
-   - Every other machine also gets pi's provider, pointed at this server through
-     the tailnet exposure below, and the API key.
-   - Restore the weights (~56 GB, archive first, falling back to Hugging Face,
+8. **Server only:** Local LLM, two servers: chat (Ornith, port 8080, with
+   web search and llama-server's web UI) and code (Swift Qwen, port 8081, for
+   pi). `models.lock.yaml` assigns each model its role, port and settings.
+   `~/.config/llama/`, pi's model and MCP config in `~/.pi/agent/`, the API
+   key (from 1Password item `llama-api-key`) and the `local.llama-agent` and
+   `local.llama-code` LaunchAgents arrive with pass 2. The weights do not.
+   - Every other machine also gets pi's providers, pointed at this server
+     through the tailnet exposure below, and the API key. pi's search tools
+     (`~/.pi/agent/mcp.json`) are server-only: they need this machine's SearXNG.
+   - Restore the weights (~70 GB, archive first, falling back to Hugging Face,
      SHA-256 verified against `models.lock.yaml`): `~/.config/llama/restore-models.sh`
-   - The LaunchAgent runs `llama-agent.sh` (the server plus the step 9 tools)
-     at login and restarts it if it exits. Until the weights and SearXNG are
-     in place it fails and retries every 30s. An apply that changes the
-     llama scripts, `mcp-servers.json` or `models.lock.yaml` restarts it. Log:
-     `~/Library/Logs/llama-agent.log`.
-   - `launchctl bootout gui/$(id -u)/local.llama-agent` stops it until the
-     next login; `launchctl disable` with the same target keeps it off
-     (`enable` undoes it). For the plain server with no tools, stop it and run
-     `~/.config/llama/llama-serve.sh`.
-   - Expose it to the tailnet. The server binds loopback, so without this only
-     this machine can reach it. Persists across reboots:
+   - `local.llama-agent` runs `llama-agent.sh` (the chat server plus the step 9
+     tools); `local.llama-code` runs `llama-serve.sh -r code`. Both start at
+     login and restart if they exit. Until the weights (and, for chat,
+     SearXNG) are in place they fail and retry every 30s. An apply that changes
+     the llama scripts, a plist, `mcp-servers.json` or `models.lock.yaml`
+     restarts both. Logs: `~/Library/Logs/llama-agent.log` and
+     `~/Library/Logs/llama-code.log`.
+   - `launchctl bootout gui/$(id -u)/<label>` stops one until the next login;
+     `launchctl disable` with the same target keeps it off (`enable` undoes
+     it). For the plain chat server with no tools, stop it and run
+     `~/.config/llama/llama-serve.sh -r chat`.
+   - Expose both to the tailnet. The servers bind loopback, so without this
+     only this machine can reach them. Persists across reboots:
      ```
      tailscale serve --bg --http=8080 http://127.0.0.1:8080
+     tailscale serve --bg --http=8081 http://127.0.0.1:8081
      ```
-     Then it answers at `http://behemoth:8080` from any tailnet device, and
-     nowhere on the LAN. Use `--https=443` instead once HTTPS certs are enabled
-     for the tailnet; they are not today, and `tailscale serve --https` hangs on
-     cert provisioning rather than reporting why.
+     Then they answer at `http://behemoth:8080` and `:8081` from any tailnet
+     device, and nowhere on the LAN. The chat server's web UI is at
+     `http://behemoth:8080` in a browser; it asks for the API key once. Use
+     `--https=443` instead once HTTPS certs are enabled for the tailnet; they
+     are not today, and `tailscale serve --https` hangs on cert provisioning
+     rather than reporting why.
 9. **Server only:** Web search for the local model, via `llama-agent.sh`.
    - Generate the SearXNG secret. Unmanaged for the same reason as the API key:
      ```
@@ -134,7 +143,8 @@ then:
 2. Run steps 7, 8 and 9 on the new server. Before registering atuin, move the
    old server's data instead: `pg_dump` from the old `atuin-db` container and
    `pg_restore` into the new one.
-3. Retire the old server's `tailscale serve` and LaunchAgent.
+3. Retire the old server's `tailscale serve` mappings (8080 and 8081) and
+   both LaunchAgents.
 
 Alternatively, retire the old machine first and give the new one the old name
 (set up with the same machine name). `server.yaml` then does not change, and

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# llama-agent.sh - llama-serve.sh plus tool calling.
+# llama-agent.sh - the chat server: llama-serve.sh -r chat plus tool calling.
 #
 # This is llama-serve.sh with MCP servers attached, kept separate because the
 # threat model differs. llama-serve.sh serves text and images: the worst a
@@ -70,4 +70,4 @@ if [ "$BUILTIN_TOOLS" = true ]; then
     EXTRA+=(--tools all --tools-runtime docker:alpine:3.22)
 fi
 
-exec "$SERVE" "${ARGS[@]}" -- "${EXTRA[@]}"
+exec "$SERVE" -r chat "${ARGS[@]}" -- "${EXTRA[@]}"
